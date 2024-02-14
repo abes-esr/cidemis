@@ -1,0 +1,19 @@
+/* TITRE */
+h1 {
+    font-size: 3em;
+    margin-left: 50px;
+}
+
+/* AUTRES */
+.show {
+    display: block;
+}
+
+.hide {
+    display: none;
+}
+
+.clear {
+    clear: both;
+    display: block;
+}

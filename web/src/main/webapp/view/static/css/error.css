@@ -1,0 +1,28 @@
+.error_page {
+    width: 600px;
+    top:50%;
+    margin-top:-150px;
+    margin-left:-300px;
+    position:absolute;
+    left:50%;
+}
+
+.error_page h2 {
+    color:#166dae;
+    font: 13px Titillium Web,sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+}    
+
+.error_page .error_msg {
+    font-size: 1.3em;
+}
+
+.error_page h2,.error_page .login_link,.error_page .error_msg {
+    display:block;
+    text-align: center;
+}
+
+.error_page .login_link {
+    font-size: 1.3em;
+}

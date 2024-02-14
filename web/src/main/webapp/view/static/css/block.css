@@ -1,0 +1,32 @@
+footer img {
+    height: 21px;
+}
+
+body {
+    margin: 0;
+}
+
+.push-footer {
+    clear: both;
+    display: block;
+}
+
+.push-footer {
+    height: 50px;
+    position: relative;
+}
+
+footer {
+    padding: 10px 0;
+    text-align: center;
+    margin: 50px;
+}
+
+footer a {
+    font-size: 10px;
+    margin: 0 5px;
+}
+
+html, body {
+    height: 100%;
+}
