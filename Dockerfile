@@ -29,8 +29,8 @@ RUN mvn --batch-mode \
         -Duser.language=fr \
         package
 
-FROM tomcat:9.0.59-jdk11-corretto as web-image
-COPY --from=build-image /build/web/target/*.war /usr/local/tomcat/webapp/ROOT.war
+FROM 9.0.59-jdk11-temurin as web-image
+COPY --from=build-image /build/web/target/*.war /usr/local/tomcat/webapps/
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 CMD ["catalina.sh", "run"]
