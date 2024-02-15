@@ -18,10 +18,12 @@ import java.io.PrintWriter;
 @Slf4j
 @Controller
 public class VerifNotice extends AbstractServlet {
-    @Value("${CBS_URL}")
+    @Value("${cbs.url}")
     private String cbsUrl;
-    @Value("${CBS_PORT}")
+    @Value("${cbs.port}")
     private String cbsPort;
+    @Value("${cbs.password}")
+    private String cbsPassword;
 
     @Override
     protected boolean checkSession() {
@@ -42,7 +44,7 @@ public class VerifNotice extends AbstractServlet {
         if ((ppn.length() == 9) &&  ppn.matches("(\\d{9})|((?i)\\d{8}X{1})")) {
             ProcessCBS cbs = new ProcessCBS();
             try {
-            	cbs.authenticate(cbsUrl, cbsPort, "M"+connexion.getRegistryuser().getLibrary(), "pabnot6");
+            	cbs.authenticate(cbsUrl, cbsPort, "M"+connexion.getRegistryuser().getLibrary(), cbsPassword);
             	
             	NoticeHelper noticehelper = new NoticeHelper(cbs);
             	noticehelper.canModifyNotice(ppn);

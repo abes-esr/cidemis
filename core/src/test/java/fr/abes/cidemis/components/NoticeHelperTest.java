@@ -35,7 +35,6 @@ class NoticeHelperTest {
 //        ppn = prop.getProperty("ppn");
 //
 //        cbs = new ProcessCBS();
-//        cbs.authenticate(cbsUrl, cbsPort, cbsLogin, "pabnot6");
 //        noticeHelper = new NoticeHelper(cbs);
 //    }
 

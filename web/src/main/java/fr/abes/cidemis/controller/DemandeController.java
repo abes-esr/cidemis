@@ -36,10 +36,12 @@ public class DemandeController extends AbstractServlet {
     @Autowired
     private CidemisManageService service;
 
-    @Value("${CBS_URL}")
+    @Value("${cbs.url}")
     private String cbsUrl;
-    @Value("${CBS_PORT}")
+    @Value("${cbs.port}")
     private String cbsPort;
+    @Value("${cbs.password}")
+    private String cbsPassword;
 
     @Value("${PATH_GLOBULE_JUSTIFICATIFS}")
     private String path;
@@ -206,7 +208,7 @@ public class DemandeController extends AbstractServlet {
         DemandeDto demandeDto = initDemande(connexion.getUser());
         Demandes demande;
         try {
-            demande = getService().getDemande().creerDemande(demandeDto, connexion.getUser(), connexion.getRegistryuser(), cbsUrl, cbsPort, path);
+            demande = getService().getDemande().creerDemande(demandeDto, connexion.getUser(), connexion.getRegistryuser(), cbsUrl, cbsPort, cbsPassword, path);
             getService().getDemande().envoiMail(demande, connexion.getUser());
         } catch (CBSException | ZoneException ex) {
             request.setAttribute("error_code", "ERROR_CREATION");
@@ -284,7 +286,7 @@ public class DemandeController extends AbstractServlet {
 
         ProcessCBS cbs = new ProcessCBS();
         try {
-            cbs.authenticate(cbsUrl, cbsPort, "M" + connexion.getRegistryuser().getLibrary(), "pabnot6");
+            cbs.authenticate(cbsUrl, cbsPort, "M" + connexion.getRegistryuser().getLibrary(), cbsPassword);
             NoticeHelper noticehelper = new NoticeHelper(cbs);
 
             if (service.getDemande().canUserDeleteDemande(connexion.getUser(), demande)) {

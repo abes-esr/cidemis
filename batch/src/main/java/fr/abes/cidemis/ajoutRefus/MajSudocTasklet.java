@@ -31,13 +31,13 @@ import java.util.Optional;
 
 @Slf4j
 public class MajSudocTasklet implements Tasklet, StepExecutionListener {
-    @Value("${sudoc.serveur}")
+    @Value("${cbs.url}")
     private String serveur;
-    @Value("${sudoc.port}")
+    @Value("${cbs.port}")
     private String port;
-    @Value("${sudoc.login}")
+    @Value("${cbs.login}")
     private String login;
-    @Value("${sudoc.pass}")
+    @Value("${cbs.password}")
     private String pass;
     @Autowired
     private CidemisDaoProvider dao;

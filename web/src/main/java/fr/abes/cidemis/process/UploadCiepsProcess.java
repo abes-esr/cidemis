@@ -51,10 +51,12 @@ public class UploadCiepsProcess {
     private Connexion connexion = null;
     private List<String> results = new ArrayList();
 
-    @Value("${CBS_URL}")
+    @Value("${cbs.url}")
     private String cbsUrl;
-    @Value("${CBS_PORT}")
+    @Value("${cbs.port}")
     private String cbsPort;
+    @Value("${cbs.password}")
+    private String cbsPassword;
 
     private int linesEmpty = 0;
     private int linesValid = 0;
@@ -74,7 +76,7 @@ public class UploadCiepsProcess {
         // Connexion avec le CBS
         ProcessCBS cbs = new ProcessCBS();
         try {
-        	cbs.authenticate(cbsUrl, cbsPort, "M" + this.connexion.getRegistryuser().getLibrary(), "pabnot6");
+        	cbs.authenticate(cbsUrl, cbsPort, "M" + this.connexion.getRegistryuser().getLibrary(), cbsPassword);
         }catch (CBSException ex) {
         	log.error( "Erreur d'authentification au CBS : " + ex);
         }

@@ -59,7 +59,7 @@ public interface IDemandesService {
 
     CidemisNotices getNotice(Demandes demande);
 
-    Demandes creerDemande(DemandeDto demande, CbsUsers user, RegistryUser registryuser, String url, String port, String path) throws ZoneException, CBSException;
+    Demandes creerDemande(DemandeDto demande, CbsUsers user, RegistryUser registryuser, String url, String port, String password, String path) throws ZoneException, CBSException;
 
     Map<String, String> getDemandemap(Demandes demande);
 

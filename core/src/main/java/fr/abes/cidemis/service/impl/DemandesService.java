@@ -42,6 +42,8 @@ public class DemandesService implements IDemandesService {
 
     private String cbsUrl;
     private String cbsPort;
+
+    private String cbsPassword;
     private String path;
 
 
@@ -506,7 +508,7 @@ public class DemandesService implements IDemandesService {
     }
 
     @Override
-    public Demandes creerDemande(DemandeDto demandeDto, CbsUsers user, RegistryUser registryuser, String cbsUrl, String cbsPort, String path) throws ZoneException, CBSException, RestClientException {
+    public Demandes creerDemande(DemandeDto demandeDto, CbsUsers user, RegistryUser registryuser, String cbsUrl, String cbsPort, String cbsPassword, String path) throws ZoneException, CBSException, RestClientException {
         log.info(
                 "CreerDemande. connexion.getUser().getUserkey() = " + user.getUserKey());
         this.cbsUrl = cbsUrl;
@@ -740,7 +742,7 @@ public class DemandesService implements IDemandesService {
     private void updateOnCBS(Demandes demande, CbsUsers user, RegistryUser registryUser) throws ZoneException, CBSException {
         ProcessCBS cbs = new ProcessCBS();
         try {
-            cbs.authenticate(cbsUrl, cbsPort, 'M' + registryUser.getLibrary(), "pabnot6");
+            cbs.authenticate(cbsUrl, cbsPort, 'M' + registryUser.getLibrary(), cbsPassword);
         } catch (CBSException ex) {
             log.error("Erreur dans l'authentification au CBS : " + ex);
         }
