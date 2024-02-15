@@ -23,7 +23,7 @@ import java.util.List;
 public class VerifNoticeDemande extends AbstractServlet {
     @Autowired
     DemandeController demandeController;
-    @Value("${CIDEMIS_URL}")
+    @Value("${cidemis.url}")
     private String url;
 
     @Override

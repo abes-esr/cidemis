@@ -39,7 +39,7 @@ public class Diffusion extends HttpServlet {
 	@Autowired
 	private CidemisManageService service;
 
-	@Value("${PATH_GLOBULE_JUSTIFICATIFS}")
+	@Value("${path.justificatifs}")
 	private String path;
 
 	public void init(ServletConfig config) throws ServletException {

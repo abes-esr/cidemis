@@ -31,7 +31,7 @@ public class CidemisMail {
     @Value("${mail.ws.cieps}")
     protected String ciepsMailAdress;
 
-    @Value("${CIDEMIS_URL}")
+    @Value("${cidemis.url}")
     private String urlDiffusion;
 
     private final Mailer mailer;

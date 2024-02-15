@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 public class CodePaysDao {
 	@Autowired
-    public Map<String, CodePays> getAllCodePays(@Value("${CODE_PAYS_URL}") String urlCodePays) {
+    public Map<String, CodePays> getAllCodePays(@Value("${code.pays.url}") String urlCodePays) {
         Map<String, CodePays> codePaysListe = new HashMap ();
         
         try {

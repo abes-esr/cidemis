@@ -18,13 +18,13 @@ import java.util.*;
 public class CidemisInitializer {
     private static Map<String, CodePays> codePaysListe;
     private static Date codePaysDate;
-    @Value("${CODE_PAYS_URL}")
+    @Value("${code.pays.url}")
     private String urlCodePays;
-    @Value("${PSI_LIEN_PERENNE}")
+    @Value("${psi.lien.perenne}")
     private String lienPerenne;
-    @Value("${PSI_LIEN_PERENNE_ISSN}")
+    @Value("${psi.lien.perenne.issn}")
     private String lienPerenneIssn;
-    @Value("${PATH_GLOBULE_MAIL_MENSUEL}")
+    @Value("${path.mail.mensuel}")
     private String pathMailMensuel;
     @Value("${mail.ws.skip}")
     private boolean skipMailFlag;

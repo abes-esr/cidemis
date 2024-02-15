@@ -43,7 +43,7 @@ public class DemandeController extends AbstractServlet {
     @Value("${cbs.password}")
     private String cbsPassword;
 
-    @Value("${PATH_GLOBULE_JUSTIFICATIFS}")
+    @Value("${path.justificatifs}")
     private String path;
 
     @Override

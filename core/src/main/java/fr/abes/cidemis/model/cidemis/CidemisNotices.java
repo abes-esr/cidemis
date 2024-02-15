@@ -69,7 +69,7 @@ public class CidemisNotices implements Serializable {
     private String statutNotice;
 
     @Transient
-    @Value("${PSI_LIEN_PERENNE}")
+    @Value("${psi.lien.perenne}")
     private String lienPerenne;
 
     public CidemisNotices(String ppn) {

@@ -37,7 +37,7 @@ public class DemandesService implements IDemandesService {
 
     private DemandeDto demandeDto;
 
-    @Value("${CIDEMIS_URL}")
+    @Value("${cidemis.url}")
     private String cidemisUrl;
 
     private String cbsUrl;
