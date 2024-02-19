@@ -16,7 +16,7 @@ then
   echo "-> Installation des crontab :"
   cat /etc/cron.d/tasks
   crontab /etc/cron.d/tasks
-
-  # execute CMD (crond)
-  exec "$@"
 fi
+
+# execute CMD (crond)
+exec "$@"
