@@ -9,7 +9,7 @@ export CIDEMIS_BATCH_LAUNCH=${CIDEMIS_BATCH_LAUNCH:=0}
 echo "$(env)
 LANG=fr_FR.UTF-8" > /etc/environment
 
-if [ CIDEMIS_BATCH_LAUNCH -eq 1 ];
+if [ $CIDEMIS_BATCH_LAUNCH -eq 1 ];
 then
   # Charge la crontab depuis le template
   envsubst < /etc/cron.d/tasks.tmpl > /etc/cron.d/tasks
