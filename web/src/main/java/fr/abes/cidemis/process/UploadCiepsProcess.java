@@ -146,10 +146,7 @@ public class UploadCiepsProcess {
                 demande.setCommentairesList(service.getCommentaires().findCommentairesByDemandes(demande));
                 demande.setJournalDemandesList(service.getDemande().findJournalDemandesByDemandes(demande));
                 try {
-                    if (demande != null)
-                        this.processDemande(demande, ppn, status, commentairetxt);
-                    else
-                        this.addMessage(demande, "Not found");
+                    this.processDemande(demande, ppn, status, commentairetxt);
                 } catch (CBSException | ZoneException e) {
                     this.addMessage(demande, "Problem in title : " + e.getMessage());
                 }
