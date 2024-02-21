@@ -46,27 +46,23 @@ public class DemandeController extends AbstractServlet {
     @Value("${path.justificatifs}")
     private String path;
 
-    @Override
-    protected boolean checkSession() {
-        return true;
-    }
-
     @Description("Afficher une demande")
     @GetMapping(value = "/afficher-demande")
     public String afficherDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         String forward = this.catchProcessRequest(request, response);
-        if (!forward.equals("")) {
+        if (!forward.isEmpty()) {
             return forward;
         }
         Connexion connexion = (Connexion) session.getAttribute("connexion");
         param.setRequest(request);
         Integer numdemande = Integer.parseInt(param.getParameter("id"));
         Demandes demande = getService().getDemande().findDemande(numdemande);
-        demande.setPiecesJustificativeslist(service.getPiecesJustificatives().findPiecesJustificativesByDemandes(demande));
-        demande.setCommentairesList(service.getCommentaires().findCommentairesByDemandes(demande));
 
         // Si on a trouvé une demande, on la met à dispo de la jsp
         if (demande != null) {
+            demande.setPiecesJustificativeslist(service.getPiecesJustificatives().findPiecesJustificativesByDemandes(demande));
+            demande.setCommentairesList(service.getCommentaires().findCommentairesByDemandes(demande));
+
             request.setAttribute("demande", demande);
 
             request.setAttribute("commentaires", demande.getCommentairesList());
@@ -103,7 +99,7 @@ public class DemandeController extends AbstractServlet {
     @PostMapping(value = "/creation-demande")
     public String creationDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         String forward = this.catchProcessRequest(request, response);
-        if (forward != "") {
+        if (!forward.isEmpty()) {
             return forward;
         }
         Connexion connexion = (Connexion) session.getAttribute("connexion");
@@ -200,7 +196,7 @@ public class DemandeController extends AbstractServlet {
     public String creerDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         String forward = this.catchProcessRequest(request, response);
         boolean error = false;
-        if (!forward.equals("")) {
+        if (!forward.isEmpty()) {
             return forward;
         }
         this.param.setRequest(request);
@@ -230,7 +226,7 @@ public class DemandeController extends AbstractServlet {
         }
 
         //Affichage d'une popup d'erreur à l'utilisateur en cas d'erreur soulevée
-        if (error == true) {
+        if (error) {
             return MyDispatcher.ERRORNOTICEJSP;
         }
 
@@ -263,9 +259,7 @@ public class DemandeController extends AbstractServlet {
         for (int i = 0; i <= demandeDto.getFileCount(); i++) {
             String nomfichier = "file" + i;
             if (!this.param.getFile(nomfichier).isEmpty()) {
-                for (Fichier fichier : this.param.getFile(nomfichier)) {
-                    listeFichiers.add(fichier);
-                }
+                listeFichiers.addAll(this.param.getFile(nomfichier));
             }
         }
         demandeDto.setFichiers(listeFichiers);
@@ -275,7 +269,7 @@ public class DemandeController extends AbstractServlet {
     @PostMapping("/SuppressionDemande")
     public String supprimerDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         String forward = this.catchProcessRequest(request, response);
-        if (forward != "") {
+        if (!forward.isEmpty()) {
             return forward;
         }
         param.setRequest(request);
@@ -290,11 +284,12 @@ public class DemandeController extends AbstractServlet {
             NoticeHelper noticehelper = new NoticeHelper(cbs);
 
             if (service.getDemande().canUserDeleteDemande(connexion.getUser(), demande)) {
-                if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
-                    noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "301", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
-                else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))
-                    noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "830", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
-
+                if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC")) {
+                    if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
+                        noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "301", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
+                    else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))
+                        noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "830", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
+                }
                 service.getDemande().delete(demande);
 
             }
@@ -310,7 +305,7 @@ public class DemandeController extends AbstractServlet {
     @PostMapping("/ArchivageDemande")
     public String archivageDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         String forward = this.catchProcessRequest(request, response);
-        if (forward != "") {
+        if (!forward.isEmpty()) {
             return forward;
         }
         param.setRequest(request);
@@ -319,12 +314,8 @@ public class DemandeController extends AbstractServlet {
         Connexion connexion = (Connexion) session.getAttribute("connexion");
         Demandes demande = service.getDemande().findDemande(Integer.parseInt(demandenum));
         demande.setJournalDemandesList(service.getDemande().findJournalDemandesByDemandes(demande));
-        if (service.getDemande().canUserArchiveDemande(connexion.getUser())) {
-            if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR) ||
-                    demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE) ||
-                    demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) {
-                service.getDemande().archiverDemande(demande, connexion.getUser());
-            }
+        if (service.getDemande().canUserArchiveDemande(connexion.getUser(), demande)) {
+            service.getDemande().archiverDemande(demande, connexion.getUser());
         }
         return MyDispatcher.LISTE_DEMANDES;
 

@@ -41,7 +41,7 @@ public abstract class AbstractServlet {
     protected String catchProcessRequest(HttpServletRequest request, HttpServletResponse response) {
         try {
             request.setCharacterEncoding(Constant.ENCODE);
-            response.setCharacterEncoding(Constant.ENCODE);
+            response.setContentType("text/html;charset=UTF-8");
             response.setHeader("Expires", "Sat, 6 May 1995 12:00:00 GMT");
             response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
             response.addHeader("Cache-Control", "post-check=0, pre-check=0");
