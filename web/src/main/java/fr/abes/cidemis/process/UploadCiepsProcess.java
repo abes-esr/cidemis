@@ -17,6 +17,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -120,19 +122,19 @@ public class UploadCiepsProcess {
         Demandes demande;
         HSSFRow row = (HSSFRow) rowIt.next();
 
-        String demandeNum = this.getCellValue(row.getCell(0, HSSFRow.CREATE_NULL_AS_BLANK));
-        String requestType = this.getCellValue(row.getCell(1, HSSFRow.CREATE_NULL_AS_BLANK));
-        String concernedField = this.getCellValue(row.getCell(2, HSSFRow.CREATE_NULL_AS_BLANK));
-        String countryCode = this.getCellValue(row.getCell(3, HSSFRow.CREATE_NULL_AS_BLANK));
-        String centreIssn = this.getCellValue(row.getCell(4, HSSFRow.CREATE_NULL_AS_BLANK));
-        String typePub = this.getCellValue(row.getCell(5, HSSFRow.CREATE_NULL_AS_BLANK));
-        String titre = this.getCellValue(row.getCell(6, HSSFRow.CREATE_NULL_AS_BLANK));
-        String status = this.getCellValue(row.getCell(7, HSSFRow.CREATE_NULL_AS_BLANK));
-        String commentairetxt = this.getCellValue(row.getCell(8, HSSFRow.CREATE_NULL_AS_BLANK));
-        String commentairelist = this.getCellValue(row.getCell(9, HSSFRow.CREATE_NULL_AS_BLANK));
-        String ppn = this.getCellValue(row.getCell(10, HSSFRow.CREATE_NULL_AS_BLANK));
-        String attachments = this.getCellValue(row.getCell(11, HSSFRow.CREATE_NULL_AS_BLANK));
-        String links = this.getCellValue(row.getCell(12, HSSFRow.CREATE_NULL_AS_BLANK));
+        String demandeNum = this.getCellValue(row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String requestType = this.getCellValue(row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String concernedField = this.getCellValue(row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String countryCode = this.getCellValue(row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String centreIssn = this.getCellValue(row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String typePub = this.getCellValue(row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String titre = this.getCellValue(row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String status = this.getCellValue(row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String commentairetxt = this.getCellValue(row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String commentairelist = this.getCellValue(row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String ppn = this.getCellValue(row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String attachments = this.getCellValue(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
+        String links = this.getCellValue(row.getCell(12, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
         
         // Si la ligne n'est pas une ligne d'entête
         if (!this.isHeaderRow(demandeNum)) {
@@ -340,7 +342,7 @@ public class UploadCiepsProcess {
      * @return the value of the cell
      */
     public String getCellValue(HSSFCell cell) {
-        if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+        if (cell.getCellType() == CellType.NUMERIC) {
             NumberFormat nf = new DecimalFormat("#.####");
             return nf.format(cell.getNumericCellValue());
         }

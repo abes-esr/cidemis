@@ -1,5 +1,6 @@
 package fr.abes.cidemis;
 
+import fr.abes.cidemis.configuration.CidemisContextListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -24,6 +25,7 @@ public class CidemisApplication extends SpringBootServletInitializer {
     public ServletListenerRegistrationBean<ServletContextListener> listenerRegistrationBean() {
         ServletListenerRegistrationBean<ServletContextListener> bean =
                 new ServletListenerRegistrationBean<>();
+        bean.setListener(new CidemisContextListener());
         return bean;
 
     }
