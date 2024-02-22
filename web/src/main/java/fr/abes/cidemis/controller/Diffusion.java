@@ -78,7 +78,7 @@ public class Diffusion extends HttpServlet {
 
 	@RequestMapping(value = "/diffusion", method = RequestMethod.GET)
 	protected void diffusion(HttpServletRequest request, HttpServletResponse response) {
-		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html;charset=UTF-8");
 		if (request.getParameter("id") != null) {
 			Integer pjid = Integer.parseInt(request.getParameter("id"));
 			PiecesJustificatives pj = this.service.getPiecesJustificatives().findPiecesJustificatives(pjid);

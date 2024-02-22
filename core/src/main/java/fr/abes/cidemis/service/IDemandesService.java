@@ -33,15 +33,13 @@ public interface IDemandesService {
 
     boolean canUserModifyDemande(CbsUsers user, Demandes demande);
 
-    boolean canUserDeleteDemande(CbsUsers user, Demandes demande);
+    boolean canUserArchiveDemande(CbsUsers user, Demandes demande);
 
-    boolean canUserArchiveDemande(CbsUsers user);
+    boolean canUserDeleteDemande(CbsUsers user, Demandes demande);
 
     boolean save(JournalDemandes journalDemandes);
 
     boolean delete(JournalDemandes journalDemandes);
-
-    JournalDemandes findJournalDemandes(Integer idJournalDemande);
 
     List<JournalDemandes> findAllJournalDemandes();
 
@@ -56,8 +54,6 @@ public interface IDemandesService {
     boolean saveDemandesListByEtatsdemandes(EtatsDemandes etatsdemandes);
 
     boolean saveDemandesListByTypesdemandes(TypesDemandes typesdemandes);
-
-    CidemisNotices getNotice(Demandes demande);
 
     Demandes creerDemande(DemandeDto demande, CbsUsers user, RegistryUser registryuser, String url, String port, String password, String path) throws ZoneException, CBSException;
 

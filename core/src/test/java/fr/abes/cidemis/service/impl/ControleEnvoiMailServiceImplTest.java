@@ -16,11 +16,12 @@ import org.mockito.MockitoAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+
 class ControleEnvoiMailServiceImplTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private CidemisManageService service;
+    CidemisManageService service;
     @InjectMocks
-    private ControleEnvoiMailServiceImpl controleEnvoiMailService;
+    ControleEnvoiMailServiceImpl controleEnvoiMailService;
 
     CbsUsers cbsUsers;
     Roles roles;
@@ -29,8 +30,7 @@ class ControleEnvoiMailServiceImplTest {
 
     @BeforeEach
     void init(){
-        MockitoAnnotations.initMocks(this);
-
+        MockitoAnnotations.openMocks(this);
         Roles roleCatalogueur = new Roles();
         roleCatalogueur.setIdRole(Constant.ROLE_CATALOGUEUR);
         when(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR)).thenReturn(roleCatalogueur);

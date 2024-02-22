@@ -7,6 +7,7 @@ import fr.abes.cidemis.model.cidemis.Connexion;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.Options;
 import fr.abes.cidemis.model.cidemis.Taggues;
+import fr.abes.cidemis.service.impl.DemandesService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +27,12 @@ import java.util.List;
 @Slf4j
 @Controller
 public class ListeDemandesAjax extends AbstractServlet {
+	private final DemandesService service;
+
+	public ListeDemandesAjax(DemandesService service) {
+		this.service = service;
+	}
+
 	@Override
 	protected boolean checkSession() { return true; }
 
@@ -126,27 +133,8 @@ public class ListeDemandesAjax extends AbstractServlet {
 			action = new JSONObject();
 			action.put("id_demande", de.getIdDemande());
 			action.put("pieces_justificatives_nb", de.getNbPiecesJustificatives());
-			action.put("can_delete",
-					(de.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR)
-							&& connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)
-							&& de.getCbsUsers().getUserNum().equals(connexion.getUser().getUserNum()))
-							|| (de.getEtatsDemandes().getIdEtatDemande()
-									.equals(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR)
-									&& connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)
-									&& de.getCbsUsers().getUserNum().equals(connexion.getUser().getUserNum()))
-							|| connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_ABES));
-			action.put("can_archive",
-						(
-						connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR) ||
-						connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_ABES)
-						)
-						&&
-						(
-						(de.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE))||
-						(de.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE)) ||
-						(de.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR))
-						)
-					);
+			action.put("can_delete", service.canUserDeleteDemande(connexion.getUser(), de));
+			action.put("can_archive", service.canUserArchiveDemande(connexion.getUser(), de));
 
 			if (connexion.getUser().isISSNOrCIEPS())
 				action.put("commentaires_nb", de.getNbCommentairesISSN());

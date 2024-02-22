@@ -15,7 +15,6 @@ import fr.abes.cidemis.model.dto.DemandeDto;
 import fr.abes.cidemis.service.CidemisManageService;
 import fr.abes.cidemis.service.IDemandesService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -28,12 +27,9 @@ import java.util.*;
 @Service
 @Slf4j
 public class DemandesService implements IDemandesService {
-    @Autowired
-    private CidemisManageService service;
-    @Autowired
-    private CidemisDaoProvider dao;
-    @Autowired
-    private CidemisMail mail;
+    private final CidemisManageService service;
+    private final CidemisDaoProvider dao;
+    private final CidemisMail mail;
 
     private DemandeDto demandeDto;
 
@@ -45,6 +41,12 @@ public class DemandesService implements IDemandesService {
 
     private String cbsPassword;
     private String path;
+
+    public DemandesService(CidemisManageService service, CidemisDaoProvider dao, CidemisMail mail) {
+        this.service = service;
+        this.dao = dao;
+        this.mail = mail;
+    }
 
 
     /**
@@ -88,7 +90,7 @@ public class DemandesService implements IDemandesService {
     public Demandes findDemande(Integer idDemande) {
         Optional<Demandes> demandes = this.dao.getDemandesDao().findById(idDemande);
 
-        if (!demandes.isPresent()) {
+        if (demandes.isEmpty()) {
             log.debug("La fonction 'findDemandes' n'a retournée aucun résultat. Id_demande:" + idDemande);
             return null;
         }
@@ -131,10 +133,8 @@ public class DemandesService implements IDemandesService {
     }
 
     private void updateNoticesSupprimees(List<Demandes> demandesList) {
-        if (demandesList.size() != 0) {
-            ListIterator<Demandes> iterator = demandesList.listIterator();
-            while (iterator.hasNext()) {
-                Demandes demande = iterator.next();
+        if (!demandesList.isEmpty()) {
+            for (Demandes demande : demandesList) {
                 if (demande.getNotice() != null && demande.getNotice().getStatutNotice().equals("d")) {
                     demande.setNoticeSupprimeeSudoc();
                 }
@@ -248,7 +248,7 @@ public class DemandesService implements IDemandesService {
      *
      * @param user
      * @param demande
-     * @return
+     * @return true si l'utilisateur peut modifier la demande, false sinon
      */
     @Override
     public boolean canUserModifyDemande(CbsUsers user, Demandes demande) {
@@ -279,11 +279,13 @@ public class DemandesService implements IDemandesService {
     }
 
     @Override
-    public boolean canUserArchiveDemande(CbsUsers user) {
+    public boolean canUserArchiveDemande(CbsUsers user, Demandes demande) {
         switch (user.getRoles().getIdRole()) {
             case Constant.ROLE_ABES:
             case Constant.ROLE_RESPONSABLE_CR:
-                return true;
+                return ((demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE))||
+                        (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE)) ||
+                        (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)));
             default:
                 return false;
         }
@@ -293,7 +295,8 @@ public class DemandesService implements IDemandesService {
      * Si c'est un administrateur ou si c'est le créateur de la demande et
      * qu'elle est dans l'état qu'il lui corresponds
      *
-     * @param user
+     * @param user : l'utilisateur à vérifier
+     * @param demande : la demande à vérifier
      * @return true if user can delete it
      */
     public boolean canUserDeleteDemande(CbsUsers user, Demandes demande) {
@@ -317,7 +320,9 @@ public class DemandesService implements IDemandesService {
         }
 
         return canDelete;
+
     }
+
 
     @Override
     public void archiverDemande(Demandes demande, CbsUsers user) {
@@ -372,17 +377,6 @@ public class DemandesService implements IDemandesService {
                     + journalDemandes.getIdJournalDemande().toString(), ex);
             return false;
         }
-    }
-
-    @Override
-    public JournalDemandes findJournalDemandes(Integer idJournalDemande) {
-        Optional<JournalDemandes> journalDemandes = this.dao.getJournalDemandesDao().findById(idJournalDemande);
-
-        if (!journalDemandes.isEmpty())
-            log.debug("La fonction 'findJournal_Demandes' n'a retournée aucun résultat. Id_journaldemande:"
-                    + idJournalDemande);
-
-        return journalDemandes.get();
     }
 
     @Override
@@ -449,7 +443,7 @@ public class DemandesService implements IDemandesService {
                 this.dao.getJournalDemandesDao().delete(journal_demandesBDD);
         }
 
-        return (dao.getJournalDemandesDao().saveAll(journalDemandesList).size() > 0);
+        return (!dao.getJournalDemandesDao().saveAll(journalDemandesList).isEmpty());
     }
 
     @Override
@@ -468,7 +462,7 @@ public class DemandesService implements IDemandesService {
                 this.dao.getDemandesDao().delete(demandesBDD);
         }
 
-        return (dao.getDemandesDao().saveAll(demandesList).size() > 0);
+        return (!dao.getDemandesDao().saveAll(demandesList).isEmpty());
     }
 
     @Override
@@ -485,21 +479,7 @@ public class DemandesService implements IDemandesService {
                 this.dao.getDemandesDao().delete(demandesBDD);
         }
 
-        return (dao.getDemandesDao().saveAll(demandesList).size() > 0);
-    }
-
-    @Override
-    public CidemisNotices getNotice(Demandes demande) {
-        if (demande.getNotice() == null) {
-            if (!demande.getNotice().getPpn().isEmpty()) {
-                demande.setNotice(dao.getCidemisNoticeDao().findById(demande.getNotice().getPpn()).get());
-            }
-            if (demande.getNotice() == null)
-                demande.setNotice(new CidemisNotices());
-            else
-                return demande.getNotice();
-        }
-        return demande.getNotice();
+        return (!dao.getDemandesDao().saveAll(demandesList).isEmpty());
     }
 
     @Override
@@ -513,6 +493,7 @@ public class DemandesService implements IDemandesService {
                 "CreerDemande. connexion.getUser().getUserkey() = " + user.getUserKey());
         this.cbsUrl = cbsUrl;
         this.cbsPort = cbsPort;
+        this.cbsPassword = cbsPassword;
         this.path = path;
         this.demandeDto = demandeDto;
         CidemisNotices notice;
@@ -558,10 +539,10 @@ public class DemandesService implements IDemandesService {
             }
         }
         // Mise à jour des autres informations relatives à la demande
-        demande = this.updateComments(demande, user);
-        demande = this.updateTaggues(demande);
-        demande = this.updateJustificatifs(demande, user);
-        demande = this.updateJournal(demande, user);
+        this.updateComments(demande, user);
+        this.updateTaggues(demande);
+        this.updateJustificatifs(demande, user);
+        this.updateJournal(demande, user);
 
         demande.setNbCommentaires(demande.getCommentairesList().size());
         demande.setNbPiecesJustificatives(demande.getPiecesJustificativeslist().size());
@@ -790,14 +771,14 @@ public class DemandesService implements IDemandesService {
      */
     private Demandes updateComments(Demandes demande, CbsUsers user) {
         if (!this.demandeDto.getCommentaireTxt().isEmpty()) {
-            Commentaires commentaire = dao.getCommentairesDao().findById(this.demandeDto.getLastIdCommentaire().intValue()).orElse(new Commentaires());
+            Commentaires commentaire = dao.getCommentairesDao().findById(this.demandeDto.getLastIdCommentaire()).orElse(new Commentaires());
             commentaire.setCbsUsers(user);
             commentaire.setLibCommentaire(this.demandeDto.getCommentaireTxt());
             commentaire.setDemande(demande);
             commentaire.setDateCommentaire(new Date());
             commentaire.setVisibleISSN(this.demandeDto.getCommentaireVisibleIssn());
 
-            if (this.demandeDto.getLastIdCommentaire().intValue() <= 0) {
+            if (this.demandeDto.getLastIdCommentaire() <= 0) {
                 demande.getCommentairesList().add(commentaire);
             } else {
                 ListIterator<Commentaires> listIterator = demande.getCommentairesList().listIterator();
