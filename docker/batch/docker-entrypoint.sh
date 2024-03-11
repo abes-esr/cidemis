@@ -1,9 +1,16 @@
 #!/bin/bash
 
+
+
 # Paramètres par défaut du conteneur
 export CIDEMIS_BATCH_CRON_STATS=${CIDEMIS_BATCH_CRON_STATS:='50 8 1 * *'}
 export CIDEMIS_BATCH_CRON_MAILING=${CIDEMIS_BATCH_CRON_MAILING:='50 8 1 * *'}
 export CIDEMIS_BATCH_LAUNCH=${CIDEMIS_BATCH_LAUNCH:='0'}
+export CIDEMIS_BATCH_CERT=${CIDEMIS_BATCH_CERT:="/cert/"}
+
+chmod u+x $CIDEMIS_BATCH_CERT/certif.sh
+
+$CIDEMIS_BATCH_CERT/certif.sh
 
 # Réglage de /etc/environment pour que les crontab s'exécutent avec les bonnes variables d'env
 echo "$(env)
