@@ -83,14 +83,10 @@
             <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--TEST-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <!-- Exclude JUnit 4 from starter-test (and all other related
-                test-starter, i.e those for security and project reactor -->
             <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>
@@ -101,13 +97,6 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.9.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <scm>
