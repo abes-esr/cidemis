@@ -2,27 +2,21 @@ package fr.abes.cidemis.components;
 
 import fr.abes.cbs.exception.CBSException;
 import fr.abes.cbs.exception.ZoneException;
-import fr.abes.cbs.notices.Biblio;
+import fr.abes.cbs.notices.NoticeConcrete;
 import fr.abes.cbs.process.ProcessCBS;
-import fr.abes.cbs.utilitaire.Constants;
-import fr.abes.cbs.utilitaire.Utilitaire;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NoticeHelper {
 
-    private ProcessCBS cbs;
+    private final ProcessCBS cbs;
 
-    @Getter
-    private String notice;
-
-    private Biblio noticeBiblio;
+    private NoticeConcrete noticeConcrete;
 
     /**
      * Prépare la connexion au CBS
      *
-     * @param cbs
+     * @param cbs : objet correspondant à la connexion au cbs
      */
     public NoticeHelper(ProcessCBS cbs) {
         this.cbs = cbs;
@@ -31,125 +25,82 @@ public class NoticeHelper {
     /**
      * Retourne une notice
      *
-     * @param ppn
-     * @return
+     * @param ppn ppn de la notice à chercher
+     * @return notice trouvée
      */
-    private String getNotice(String ppn) {
+    private NoticeConcrete getNotice(String ppn) throws CBSException {
         try {
             cbs.search("che ppn " + ppn);
-            return cbs.affUnma();
-        } catch (CBSException ex) {
+            return cbs.editerNoticeConcrete("1");
+        } catch (CBSException | ZoneException ex) {
             log.error("Erreur de récupération de la notice" + ex);
-            return "";
+            throw new CBSException("V/VERROR", "Erreur lors de la récupération de la notice : " + ppn);
         }
     }
 
-    /**
-     * Vérifie que l'on peut modifier un PPN
-     *
-     * @param ppn
-     * @return
-     */
-    private void preparerPPN(String ppn) throws CBSException {
-        this.notice = "";
-        this.getNotice(ppn);
-        // Tentative du passage en édition
-        notice = Constants.STR_1F + Utilitaire.recupEntre(cbs.editer("1"), Constants.STR_1F, Constants.STR_1E) + Constants.STR_1E;
-
-    }
 
     /**
      * Enregistre la notice
      *
-     * @return
      */
     private void enregistrerModif() throws CBSException {
-        cbs.modifierNotice("1", notice);
+        cbs.modifierNoticeConcrete("1", noticeConcrete);
     }
 
     /**
      * Modifie une notice
      *
-     * @param ppn
-     * @param zone
-     * @param souszone
-     * @param valeur
-     * @return
+     * @param ppn ppn de la notice à modifier
+     * @param zone zone à ajouter à la notice
+     * @param souszone sous zone à ajouter à la zone
+     * @param valeur valeur de la sous zone
      */
-    public void modifierZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, ZoneException {
-        preparerPPN(ppn);
-        noticeBiblio = new Biblio(notice);
-        noticeBiblio.replaceSousZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
-        notice = noticeBiblio.toString().substring(1, noticeBiblio.toString().length() - 1);
+    public void modifierZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException {
+        noticeConcrete = getNotice(ppn);
+        noticeConcrete.getNoticeBiblio().replaceSousZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
         enregistrerModif();
     }
 
     /**
      * Supprimer une zone d'une notice
      *
-     * @param ppn
-     * @param zone
-     * @param souszone
-     * @param valeur
-     * @return
+     * @param ppn ppn de la notice à modifier
+     * @param zone zone à supprimer
+     * @param souszone sous zone à supprimer
+     * @param valeur valeur devant être trouvé dans la sous zone pour la supprimer
      */
     public void chercherEtSupprimerZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, ZoneException {
-        preparerPPN(ppn);
-        noticeBiblio = new Biblio(notice);
-        noticeBiblio.deleteZoneWithValue(zone, souszone, valeur);
-        notice = noticeBiblio.toString().substring(1, noticeBiblio.toString().length() - 1);
+        noticeConcrete = getNotice(ppn);
+        noticeConcrete.getNoticeBiblio().deleteZoneWithValue(zone, souszone, valeur);
         enregistrerModif();
     }
 
     /**
      * Ajoute une zone dans une notice
      *
-     * @param ppn
-     * @param zone
-     * @param souszone
-     * @param valeur
-     * @return
+     * @param ppn ppn de la notice à modifier
+     * @param zone zone à ajouter
+     * @param souszone sous zone à ajouter à la zone
+     * @param valeur valeur à ajouter dans la sous zone
      */
     public void ajoutZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, ZoneException {
-        preparerPPN(ppn);
-        noticeBiblio = new Biblio(notice);
-        noticeBiblio.addZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
-        notice = noticeBiblio.toString().substring(1, noticeBiblio.toString().length() - 1);
+        noticeConcrete = getNotice(ppn);
+        noticeConcrete.getNoticeBiblio().addZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
         enregistrerModif();
     }
 
     /**
      * On tente de supprimer une zone qui n'existe pas ... Afin de faire une fausse modif
      *
-     * @param ppn
-     * @return Si error ne contient pas de message d'erreur, alors la notice est modifiable
+     * @param ppn ppn de la notice à vérifier
      */
-    public Boolean canModifyNotice(String ppn) {
+    public void canModifyNotice(String ppn) {
         try {
-            preparerPPN(ppn);
-            notice = Utilitaire.suppZoneBiblio(notice, "100000000", "$a");
+            noticeConcrete = getNotice(ppn);
+            noticeConcrete.getNoticeBiblio().deleteSousZone("100000000", "$a");
             enregistrerModif();
-            return true;
         } catch (CBSException ex) {
             log.error("Erreur dans suppression zone dans notice : " + ex);
-            return false;
         }
-    }
-
-    /**
-     * Retourne la date de dernière mise à jour d'une notice
-     *
-     * @param ppn
-     * @return
-     */
-    public String getDateUpdate(String ppn) {
-        log.info("PPN synchronized " + ppn);
-        this.notice = this.getNotice(ppn);
-        int index = this.notice.indexOf("Statut");
-
-        if (index > 20)
-            return this.notice.substring(index - 18, index - 1);
-        else
-            return "";
     }
 }
