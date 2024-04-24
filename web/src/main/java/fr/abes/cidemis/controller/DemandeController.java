@@ -206,18 +206,18 @@ public class DemandeController extends AbstractServlet {
         try {
             demande = getService().getDemande().creerDemande(demandeDto, connexion.getUser(), connexion.getRegistryuser(), cbsUrl, cbsPort, cbsPassword, path);
             getService().getDemande().envoiMail(demande, connexion.getUser());
-        } catch (CBSException | ZoneException ex) {
-            request.setAttribute("error_code", "ERROR_CREATION");
-            request.setAttribute("texte_erreur", ex.getMessage());
-            error = true;
-            log.error(ex.getMessage());
         } catch (JsonProcessingException r) {
             request.setAttribute("error_code", "ERROR_WSMAIL");
             request.setAttribute("texte_erreur", r.getMessage());
             request.setAttribute("link_redirection", "/liste-demandes");
             log.error(r.getMessage());
             error = true;
-        } catch(RestClientException c) {
+        } catch (CBSException | ZoneException | IOException ex) {
+            request.setAttribute("error_code", "ERROR_CREATION");
+            request.setAttribute("texte_erreur", ex.getMessage());
+            error = true;
+            log.error(ex.getMessage());
+        }  catch(RestClientException c) {
             request.setAttribute("error_code", "ERROR_WSMAIL_INDISPONIBLE");
             request.setAttribute("code_erreur_premier_chiffre", c.getMessage().substring(0,1));
             request.setAttribute("code_erreur_http", c.getMessage().substring(0,3));

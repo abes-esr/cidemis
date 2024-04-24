@@ -42,7 +42,7 @@ public class UploadCiepsProcess {
     private static final String REJECTED = "REJECTED";
     private static final String COMPLETED = "COMPLETED";
     private static final String INFORMATION_NEEDED = "INFORMATION NEEDED";
-    
+
     private static final String LINE_NUMBER = "Line n°";
 
     @Autowired
@@ -74,28 +74,30 @@ public class UploadCiepsProcess {
         ParamHelper param = new ParamHelper(request);
         List<Fichier> fichierList = param.getFile("fichier_cieps");
         Fichier fichier = fichierList.get(0);
-        
+
         // Connexion avec le CBS
         ProcessCBS cbs = new ProcessCBS();
         try {
         	cbs.authenticate(cbsUrl, cbsPort, "M" + this.connexion.getRegistryuser().getLibrary(), cbsPassword);
-        }catch (CBSException ex) {
+        } catch (CBSException ex) {
         	log.error( "Erreur d'authentification au CBS : " + ex);
+        } catch (IOException ex) {
+            log.error("Erreur de communication avec le CBS");
         }
         this.noticehelper = new NoticeHelper(cbs);
         this.results = new ArrayList();
-        
+
         this.linesEmpty = 0;
         this.linesValid = 0;
         this.nbLine = 0;
-        
+
         // Parcours du document Excel
         try {
             POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(fichier.getFile()));
-            
+
             HSSFWorkbook wb = new HSSFWorkbook(fs);
             HSSFSheet sheet = wb.getSheetAt(0);
-            
+
             // Pour chaque ligne du fichier
             for (Iterator<?> rowIt = sheet.rowIterator(); rowIt.hasNext();) {
                 this.processLine(rowIt);
@@ -104,21 +106,21 @@ public class UploadCiepsProcess {
         catch (IOException e) {
             log.error( "Error UploadCieps", e);
         }
-        
+
         // Renseignement des valeurs pour le diagnostic
         request.setAttribute("lines_count", this.nbLine);
         request.setAttribute("lines_valid", this.linesValid);
         request.setAttribute("linesEmpty", this.linesEmpty);
         request.setAttribute("results", this.results);
     }
-    
+
     /**
      * Pour chaque ligne du fichier, la fonction regarde si elle n'est pas vide et si elle semble valide
      * @param rowIt
      */
     protected void processLine(Iterator<?> rowIt) {
         this.nbLine++;
-        
+
         Demandes demande;
         HSSFRow row = (HSSFRow) rowIt.next();
 
@@ -135,7 +137,7 @@ public class UploadCiepsProcess {
         String ppn = this.getCellValue(row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
         String attachments = this.getCellValue(row.getCell(11, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
         String links = this.getCellValue(row.getCell(12, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK));
-        
+
         // Si la ligne n'est pas une ligne d'entête
         if (!this.isHeaderRow(demandeNum)) {
             // Si la ligne est vide
@@ -149,7 +151,7 @@ public class UploadCiepsProcess {
                 demande.setJournalDemandesList(service.getDemande().findJournalDemandesByDemandes(demande));
                 try {
                     this.processDemande(demande, ppn, status, commentairetxt);
-                } catch (CBSException | ZoneException e) {
+                } catch (CBSException | ZoneException | IOException e) {
                     this.addMessage(demande, "Problem in title : " + e.getMessage());
                 }
             }
@@ -159,7 +161,7 @@ public class UploadCiepsProcess {
             }
         }
     }
-    
+
     /**
      * Après que la ligne a été vérifié, cette fonction vers vérifier que tout est valide puis l'enregistrer
      * - L'utilisateur peut-il enregistrer la demande
@@ -169,7 +171,7 @@ public class UploadCiepsProcess {
      * @param status
      * @param commentairetxt
      */
-    protected void processDemande(Demandes demande, String ppn, String status, String commentairetxt) throws ZoneException, CBSException {
+    protected void processDemande(Demandes demande, String ppn, String status, String commentairetxt) throws ZoneException, CBSException, IOException {
         if (service.getDemande().canUserModifyDemande(this.connexion.getUser(), demande)) {
             if (demande.getNotice().getPpn().equals(ppn)) {
                 if ((!status.isEmpty() || demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION)) && this.checkDemande(demande, status, commentairetxt)) {
@@ -190,7 +192,7 @@ public class UploadCiepsProcess {
             this.addMessage(demande, "You can't modify request number '" + demande.getIdDemande() + "'. This request is assigned to another role.");
         }
     }
-    
+
     /**
      * Vérifie que les informations contenu dans le fichier sont logiques
      * @param demande
@@ -201,7 +203,7 @@ public class UploadCiepsProcess {
     public boolean checkDemande(Demandes demande, String status, String commentairetxt) {
         Boolean success = true;
         String issn = status;
-        
+
         if (UploadCiepsProcess.REJECTED.equals(status)) {
             if (!commentairetxt.isEmpty()) {
                 demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE));
@@ -244,11 +246,11 @@ public class UploadCiepsProcess {
                 success = false;
             }
         }
-        
+
         return success;
     }
-    
-    public void saveDemande(Demandes demande, String ppn, String status, String commentairetxt) throws ZoneException, CBSException {
+
+    public void saveDemande(Demandes demande, String ppn, String status, String commentairetxt) throws ZoneException, CBSException, IOException {
         this.linesValid++;
 
         String issn = status;
@@ -296,7 +298,7 @@ public class UploadCiepsProcess {
         }
         else {
             StringBuilder commentaireErreur = new StringBuilder("Un problème est survenu lors de la modification de la notice, voir l'erreur renvoyée par le système ci-dessous:\r\n");
-            
+
             for (String erreur:erreursNoticeZone) {
                 commentaireErreur.append(erreur + "\r\n");
             }
@@ -320,7 +322,7 @@ public class UploadCiepsProcess {
             journal = createNewJournal(demande, dateNow);
         }
         demande.getJournalDemandesList().add(journal);
-        
+
         // //////////////////////////////////////////////////////////////////////////////////////////////
         // FIN //////////////////////////////////////////////////////////////////////////////////////////
         service.getDemande().save(demande);
@@ -350,7 +352,7 @@ public class UploadCiepsProcess {
             return cell.getRichStringCellValue().getString().trim();
         }
     }
-    
+
     /**
      * Retourne vrai si la ligne en question est une ligne d'entête
      * @param demandeNum
@@ -359,7 +361,7 @@ public class UploadCiepsProcess {
     public boolean isHeaderRow(String demandeNum) {
         return "New assignments requests".equals(demandeNum)  || "Cidemis Number".equals(demandeNum)  || demandeNum.contains("Outstanding requests");
     }
-    
+
     /**
      * Ajoute un message dans la ligne des logs
      * @param demande
@@ -378,11 +380,11 @@ public class UploadCiepsProcess {
      * @param valueToAdd
      * @return vrai si la suppression et l'addition ont réussies
      */
-    public void deleteAndAddZone(Demandes demande, String zone, String subZone, String valueToDelete, String valueToAdd) throws ZoneException, CBSException {
+    public void deleteAndAddZone(Demandes demande, String zone, String subZone, String valueToDelete, String valueToAdd) throws ZoneException, CBSException, IOException {
         this.deleteZone(demande, zone, subZone, valueToDelete);
         this.addZone(demande, zone, subZone, valueToAdd);
     }
-    
+
     /**
      * Cherche une zone dans une notice et la supprime
      * @param demande
@@ -391,7 +393,7 @@ public class UploadCiepsProcess {
      * @param value
      * @returnvrai si la suppression a réussie
      */
-    public void deleteZone(Demandes demande, String zone, String subZone, String value) throws ZoneException, CBSException {
+    public void deleteZone(Demandes demande, String zone, String subZone, String value) throws ZoneException, CBSException, IOException {
         this.noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), zone, subZone, value);
     }
 
@@ -403,7 +405,7 @@ public class UploadCiepsProcess {
      * @param value
      * @returnsi l'addition a réussie
      */
-    public void addZone(Demandes demande, String zone, String subZone, String value) throws ZoneException, CBSException {
+    public void addZone(Demandes demande, String zone, String subZone, String value) throws ZoneException, CBSException, IOException {
         this.noticehelper.ajoutZoneNotice(demande.getNotice().getPpn(), zone, subZone, value);
     }
 }

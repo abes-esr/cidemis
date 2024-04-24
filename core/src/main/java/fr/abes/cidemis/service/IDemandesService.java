@@ -6,6 +6,7 @@ import fr.abes.cbs.exception.ZoneException;
 import fr.abes.cidemis.model.cidemis.*;
 import fr.abes.cidemis.model.dto.DemandeDto;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public interface IDemandesService {
 
     boolean saveDemandesListByTypesdemandes(TypesDemandes typesdemandes);
 
-    Demandes creerDemande(DemandeDto demande, CbsUsers user, RegistryUser registryuser, String url, String port, String password, String path) throws ZoneException, CBSException;
+    Demandes creerDemande(DemandeDto demande, CbsUsers user, RegistryUser registryuser, String url, String port, String password, String path) throws ZoneException, CBSException, IOException;
 
     Map<String, String> getDemandemap(Demandes demande);
 

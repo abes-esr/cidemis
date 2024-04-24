@@ -13,6 +13,7 @@ import fr.abes.cidemis.model.cidemis.Commentaires;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.Level;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -24,6 +25,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +55,7 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
         processCBS = new ProcessCBS();
         try {
             processCBS.authenticate(serveur, port, login, pass);//Récupéré de la step précédente
-        } catch (CBSException e) {
+        } catch (CBSException | IOException e) {
             log.error("Impossible de se connecter au Sudoc");
         }
     }
@@ -129,7 +131,7 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
      * @throws CBSException
      * @throws ZoneException
      */
-    private void traitementCBSCOR(Demandes demande, String commentaire) throws CBSException, ZoneException {
+    private void traitementCBSCOR(Demandes demande, String commentaire) throws CBSException, ZoneException, IOException {
         try {
             Biblio notice = chercherNotice(demande.getNotice().getPpn());
             List<Zone> listeZones = notice.findZoneWithPattern("830", "$a", pattern + demande.getIdDemande());
@@ -140,8 +142,13 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
             processCBS.modifierNotice("1", notice.toString().substring(1, notice.toString().length() - 1));
         } catch (CBSException ex) {
             log.error("erreur dans l'opération de mise à jour dans le Sudoc : " + ex.getMessage());
+            throw ex;
         } catch (ZoneException ex) {
             log.error("Erreur dans la construction de la notice : PPN : " + demande.getNotice().getPpn() + " : " + ex.getMessage());
+            throw ex;
+        } catch (IOException e) {
+            log.error("Erreur de communication avec le CBS");
+            throw e;
         }
 
     }
@@ -154,7 +161,7 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
      * @throws CBSException
      * @throws ZoneException
      */
-    private void traitementCbsNUM(Demandes demande, String commentaire) throws CBSException, ZoneException {
+    private void traitementCbsNUM(Demandes demande, String commentaire) throws CBSException, ZoneException, IOException {
         try {
             Biblio notice = chercherNotice(demande.getNotice().getPpn());
             List<Zone> listeZones = notice.findZoneWithPattern("301", "$a", pattern + demande.getIdDemande());
@@ -165,8 +172,13 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
             processCBS.modifierNotice("1", notice.toString().substring(1, notice.toString().length() - 1));
         } catch (CBSException ex) {
             log.error("erreur dans l'opération de mise à jour dans le Sudoc : " + ex.getMessage());
+            throw ex;
         } catch (ZoneException ex) {
             log.error("Erreur dans la construction de la notice : PPN : " + demande.getNotice().getPpn() + " : " + ex.getMessage());
+            throw ex;
+        } catch (IOException e) {
+            log.error("Erreur de communication avec le CBS");
+            throw e;
         }
     }
 
@@ -178,14 +190,14 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
      * @throws CBSException
      * @throws ZoneException
      */
-    private Biblio chercherNotice(String ppn) throws CBSException, ZoneException {
+    private Biblio chercherNotice(String ppn) throws CBSException, ZoneException, IOException {
         processCBS.search("che ppn " + ppn);
         if (processCBS.getNbNotices() != 0) {
             processCBS.affUnma();
             String resu = Constants.STR_1F + Utilitaire.recupEntre(processCBS.editer("1"), Constants.STR_1F, Constants.STR_1E) + Constants.STR_1E;
             return new Biblio(resu);
         }
-        throw new CBSException("XX", "Aucune notice ne correspond à la recherche");
+        throw new CBSException(Level.INFO, "Aucune notice ne correspond à la recherche");
     }
 
 
