@@ -283,7 +283,7 @@ public class DemandesService implements IDemandesService {
         switch (user.getRoles().getIdRole()) {
             case Constant.ROLE_ABES:
             case Constant.ROLE_RESPONSABLE_CR:
-                return ((demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE))||
+                return ((demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) ||
                         (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE)) ||
                         (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)));
             default:
@@ -295,7 +295,7 @@ public class DemandesService implements IDemandesService {
      * Si c'est un administrateur ou si c'est le créateur de la demande et
      * qu'elle est dans l'état qu'il lui corresponds
      *
-     * @param user : l'utilisateur à vérifier
+     * @param user    : l'utilisateur à vérifier
      * @param demande : la demande à vérifier
      * @return true if user can delete it
      */
@@ -488,7 +488,7 @@ public class DemandesService implements IDemandesService {
     }
 
     @Override
-    public Demandes creerDemande(DemandeDto demandeDto, CbsUsers user, RegistryUser registryuser, String cbsUrl, String cbsPort, String cbsPassword, String path) throws ZoneException, CBSException, RestClientException {
+    public Demandes creerDemande(DemandeDto demandeDto, CbsUsers user, RegistryUser registryuser, String cbsUrl, String cbsPort, String cbsPassword, String path) throws ZoneException, CBSException, RestClientException, IOException {
         log.info(
                 "CreerDemande. connexion.getUser().getUserkey() = " + user.getUserKey());
         this.cbsUrl = cbsUrl;
@@ -720,14 +720,9 @@ public class DemandesService implements IDemandesService {
     /**
      * Mets à jour la notice dans le CBS selon l'état
      */
-    private void updateOnCBS(Demandes demande, CbsUsers user, RegistryUser registryUser) throws ZoneException, CBSException {
+    private void updateOnCBS(Demandes demande, CbsUsers user, RegistryUser registryUser) throws ZoneException, CBSException, IOException {
         ProcessCBS cbs = new ProcessCBS();
-        try {
-            cbs.authenticate(cbsUrl, cbsPort, 'M' + registryUser.getLibrary(), cbsPassword);
-        } catch (CBSException ex) {
-            log.error("Erreur dans l'authentification au CBS : " + ex);
-        }
-
+        cbs.authenticate(cbsUrl, cbsPort, 'M' + registryUser.getLibrary(), cbsPassword);
 
         NoticeHelper noticehelper = new NoticeHelper(cbs);
         String idCidemis = " (identifiant Cidemis : " + demande.getIdDemande() + ")";
@@ -914,7 +909,7 @@ public class DemandesService implements IDemandesService {
      * @param idCidemis
      * @return
      */
-    private void updateCBSValidated(NoticeHelper noticehelper, String idCidemis, Demandes demande, CbsUsers user) throws CBSException, ZoneException {
+    private void updateCBSValidated(NoticeHelper noticehelper, String idCidemis, Demandes demande, CbsUsers user) throws CBSException, ZoneException, IOException {
         String auteur;
         String dateNowFormat = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
@@ -966,7 +961,7 @@ public class DemandesService implements IDemandesService {
      * @param idCidemis
      * @return
      */
-    private void updateCBSAcceptedAndDone(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException {
+    private void updateCBSAcceptedAndDone(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException, IOException {
         if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION)) {
             // Si l'ISSN n'est pas déjà présent dans la notice
             if (!demande.getIssn().isEmpty() &&
@@ -994,7 +989,7 @@ public class DemandesService implements IDemandesService {
      * @param idCidemis
      * @return
      */
-    private void updateCBSRefusedByISSNOrCIEPS(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException {
+    private void updateCBSRefusedByISSNOrCIEPS(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException, IOException {
         String dateNowFormat = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
         if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION)) {
@@ -1017,7 +1012,7 @@ public class DemandesService implements IDemandesService {
      * @param idCidemis
      * @return
      */
-    private void updateCBSRejected(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException {
+    private void updateCBSRejected(NoticeHelper noticehelper, String idCidemis, Demandes demande) throws CBSException, ZoneException, IOException {
         if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))
             noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "830", "$a", idCidemis);
         else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
@@ -1038,11 +1033,10 @@ public class DemandesService implements IDemandesService {
     private Demandes setEtatISSN(Demandes demande, boolean fromIssn) {
         if (Constant.getCodePaysFr().contains(demande.getNotice().getPays()))
             demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR));
+        else if (fromIssn)
+            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VERS_INTERNATIONAL));
         else
-            if (fromIssn)
-                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VERS_INTERNATIONAL));
-            else
-                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL));
+            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL));
         return demande;
     }
 
