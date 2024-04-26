@@ -11,10 +11,10 @@
     <br/>
 </c:if>
 <c:if test="${error_code eq 'ERROR_WSMAIL'}">
-    <h4>Demande enregistrée mais courriel non envoyé</h4>
+    <h4>Demande traitée mais courriel non envoyé</h4>
 </c:if>
 <c:if test="${error_code eq 'ERROR_WSMAIL_INDISPONIBLE'}">
-    <h4>Demande enregistrée mais courriel non envoyé</h4>
+    <h4>Demande traitée mais courriel non envoyé</h4>
 </c:if>
 
 <div id="popuperreurnotice">

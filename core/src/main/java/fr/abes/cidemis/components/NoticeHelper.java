@@ -37,7 +37,7 @@ public class NoticeHelper {
             return cbs.editerNoticeConcrete("1");
         } catch (CBSException | ZoneException ex) {
             log.error("Erreur de récupération de la notice" + ex);
-            throw new CBSException(Level.ERROR, "Erreur lors de la récupération de la notice : " + ppn);
+            throw new CBSException(Level.ERROR, "Erreur lors de la récupération de la notice : " + ppn + " : " + ex.getMessage());
         }
     }
 
