@@ -2,8 +2,10 @@ package fr.abes.cidemis.components;
 
 import fr.abes.cbs.exception.CBSException;
 import fr.abes.cbs.exception.ZoneException;
-import fr.abes.cbs.notices.NoticeConcrete;
+import fr.abes.cbs.notices.Biblio;
 import fr.abes.cbs.process.ProcessCBS;
+import fr.abes.cbs.utilitaire.Constants;
+import fr.abes.cbs.utilitaire.Utilitaire;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 
@@ -14,7 +16,7 @@ public class NoticeHelper {
 
     private final ProcessCBS cbs;
 
-    private NoticeConcrete noticeConcrete;
+    private Biblio noticeBiblio;
 
     /**
      * Prépare la connexion au CBS
@@ -31,10 +33,12 @@ public class NoticeHelper {
      * @param ppn ppn de la notice à chercher
      * @return notice trouvée
      */
-    private NoticeConcrete getNotice(String ppn) throws CBSException, IOException {
+    public Biblio getNotice(String ppn) throws CBSException, IOException {
         try {
             cbs.search("che ppn " + ppn);
-            return cbs.editerNoticeConcrete("1");
+            cbs.affUnma();
+            //on retourne une notice biblio au lieu d'une notice concrete car la notice peut contenir des exemplaires au format Sudoc PS non gérés par l'API
+            return new Biblio(Constants.STR_1F + Utilitaire.recupEntre(cbs.editer("1"), Constants.STR_1F, Constants.STR_1E) + Constants.STR_1E);
         } catch (CBSException | ZoneException ex) {
             log.error("Erreur de récupération de la notice" + ex);
             throw new CBSException(Level.ERROR, "Erreur lors de la récupération de la notice : " + ppn + " : " + ex.getMessage());
@@ -47,7 +51,7 @@ public class NoticeHelper {
      *
      */
     private void enregistrerModif() throws CBSException, IOException {
-        cbs.modifierNoticeConcrete("1", noticeConcrete);
+        cbs.modifierNotice("1", noticeBiblio.toString());
     }
 
     /**
@@ -59,8 +63,8 @@ public class NoticeHelper {
      * @param valeur valeur de la sous zone
      */
     public void modifierZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, IOException {
-        noticeConcrete = getNotice(ppn);
-        noticeConcrete.getNoticeBiblio().replaceSousZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
+        noticeBiblio = getNotice(ppn);
+        noticeBiblio.replaceSousZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
         enregistrerModif();
     }
 
@@ -73,8 +77,8 @@ public class NoticeHelper {
      * @param valeur valeur devant être trouvé dans la sous zone pour la supprimer
      */
     public void chercherEtSupprimerZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, ZoneException, IOException {
-        noticeConcrete = getNotice(ppn);
-        noticeConcrete.getNoticeBiblio().deleteZoneWithValue(zone, souszone, valeur);
+        noticeBiblio = getNotice(ppn);
+        noticeBiblio.deleteZoneWithValue(zone, souszone, valeur);
         enregistrerModif();
     }
 
@@ -87,8 +91,8 @@ public class NoticeHelper {
      * @param valeur valeur à ajouter dans la sous zone
      */
     public void ajoutZoneNotice(String ppn, String zone, String souszone, String valeur) throws CBSException, ZoneException, IOException {
-        noticeConcrete = getNotice(ppn);
-        noticeConcrete.getNoticeBiblio().addZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
+        noticeBiblio = getNotice(ppn);
+        noticeBiblio.addZone(zone, souszone, valeur.replaceAll("[$]{1}", "\\$\\$"));
         enregistrerModif();
     }
 
@@ -99,8 +103,8 @@ public class NoticeHelper {
      */
     public void canModifyNotice(String ppn) throws IOException {
         try {
-            noticeConcrete = getNotice(ppn);
-            noticeConcrete.getNoticeBiblio().deleteSousZone("100000000", "$a");
+            noticeBiblio = getNotice(ppn);
+            noticeBiblio.deleteSousZone("100000000", "$a");
             enregistrerModif();
         } catch (CBSException ex) {
             log.error("Erreur dans suppression zone dans notice : " + ex);
