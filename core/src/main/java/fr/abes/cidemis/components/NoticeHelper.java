@@ -38,7 +38,8 @@ public class NoticeHelper {
             cbs.search("che ppn " + ppn);
             cbs.affUnma();
             //on retourne une notice biblio au lieu d'une notice concrete car la notice peut contenir des exemplaires au format Sudoc PS non gérés par l'API
-            return new Biblio(Constants.STR_1F + Utilitaire.recupEntre(cbs.editer("1"), Constants.STR_1F, Constants.STR_1E) + Constants.STR_1E);
+            String result = cbs.editer("1");
+            return new Biblio(Utilitaire.recupEntre(result, Constants.STR_1F, Constants.STR_1E));
         } catch (CBSException | ZoneException ex) {
             log.error("Erreur de récupération de la notice" + ex);
             throw new CBSException(Level.ERROR, "Erreur lors de la récupération de la notice : " + ppn + " : " + ex.getMessage());
