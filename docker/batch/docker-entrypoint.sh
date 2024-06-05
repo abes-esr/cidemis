@@ -16,14 +16,12 @@ $CIDEMIS_BATCH_CERT/certif.sh
 echo "$(env)
 LANG=fr_FR.UTF-8" > /etc/environment
 
-if [ "$CIDEMIS_BATCH_LAUNCH" = "1" ];
-then
-  # Charge la crontab depuis le template
-  envsubst < /etc/cron.d/tasks.tmpl > /etc/cron.d/tasks
-  echo "-> Installation des crontab :"
-  cat /etc/cron.d/tasks
-  crontab /etc/cron.d/tasks
-fi
+# Charge la crontab depuis le template
+envsubst < /etc/cron.d/tasks.tmpl > /etc/cron.d/tasks
+echo "-> Installation des crontab :"
+cat /etc/cron.d/tasks
+crontab /etc/cron.d/tasks
+
 
 # execute CMD (crond)
 exec "$@"
