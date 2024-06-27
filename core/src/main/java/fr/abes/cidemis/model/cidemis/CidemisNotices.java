@@ -255,7 +255,7 @@ public class CidemisNotices implements Serializable {
             zonesManquantes.add("035 : Il ne peut y avoir qu'un seul identifiant de la notice dans un autre système (ISSN)");
         if (this.getPaysTRUE().isEmpty())
             zonesManquantes.add("102 : Pays de publication");
-        if (this.getTypeDeRessourceContinue().isEmpty())
+        if (this.getTypeDeRessourceContinue() == null || this.getTypeDeRessourceContinue().isEmpty())
             zonesManquantes.add("110 : Type de ressource continue");
         if (this.getTitrecle() == null || this.getTitrecle().isEmpty())
             zonesManquantes.add("530 : Titre clé");
@@ -269,7 +269,7 @@ public class CidemisNotices implements Serializable {
         // Test des zones manquantes
         if (this.getPaysTRUE().isEmpty())
             zonesManquantes.add("102 : Pays de publication");
-        if (this.getTypeDeRessourceContinue().isEmpty())
+        if (this.getTypeDeRessourceContinue() == null || this.getTypeDeRessourceContinue().isEmpty())
             zonesManquantes.add("110$a : Type de ressource continue");
         if ("z".equals(this.getTypeDeRessourceContinue()))
             zonesManquantes.add("Merci de préciser le type de publication (110$a)");
