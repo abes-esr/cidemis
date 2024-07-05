@@ -284,7 +284,7 @@ public class DemandeController extends AbstractServlet {
             NoticeHelper noticehelper = new NoticeHelper(cbs);
 
             if (service.getDemande().canUserDeleteDemande(connexion.getUser(), demande)) {
-                if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC")) {
+                if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC") && !connexion.getUser().getRoles().equals(Constant.ROLE_CATALOGUEUR)) {
                     if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
                         noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "301", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
                     else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))
