@@ -49,7 +49,8 @@ public class VerifPPN extends AbstractServlet {
             for (Demandes d:demandes){
                 if (d.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION) &&
                         !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE) &&
-                        !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)){
+                        !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR) &&
+                        !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_ARCHIVEE)){
                         find = true;
                 }
             }
