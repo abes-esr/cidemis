@@ -1056,9 +1056,7 @@ public class DemandesService implements IDemandesService {
             codePaysNotice = "ZZ".equals(codePaysNotice) ? "XX" : codePaysNotice;
             demande.setCentreISSN(Constant.getCodePaysSorted().get(codePaysNotice).getCodecentreissn());
         }
-
         return demande;
-
     }
 
     // /////////////////////////////////////////////
