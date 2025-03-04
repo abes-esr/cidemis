@@ -232,7 +232,7 @@ public class ParamHelper {
 
             }
         } catch (IOException ex) {
-            log.error(null, ex);
+            log.info("Pas de fichier ajouté à la demande");
         } catch (IllegalStateException ex) {
             log.error(null, ex);
         } catch (ServletException ex) {
