@@ -7,7 +7,7 @@ Configuration locale minimale :
 - renseigner les couples clé / valeur ci dessous
 
 Note: ces valeurs sont susceptibles d'évoluer (observer les logs d'erreur de lancement de l'appli pour des valeurs ou clés manquantes)
-```xml
+```txt
 cidemis.datasource.url=
 cidemis.datasource.username=
 cidemis.datasource.password=
