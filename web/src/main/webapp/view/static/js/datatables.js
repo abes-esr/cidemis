@@ -178,7 +178,7 @@ function initDataTables() {
        * @type filtres du dom
        */
       var checkedShowDemandesDone = $('#show_demandes_done').val() === 'true' || getCookieValue('jsSessionCookieKeepDisplayedDemandesDone') === 'true' ? 'checked="checked" ' : '';
-      $('.filtres').append('<span style="display: block;margin-bottom: 2em;"></span><span id="divaffichertermine" style="margin-left: 12px">' + '<input ' + checkedShowDemandesDone + ' type="checkbox" name="affichertermine" id="affichertermine" style="position: relative; vertical-align: middle"/>' + '<label style="position: relative;display: inline-block;vertical-align: middle;" for="affichertermine" id="loaderTermine">Demandes terminées</label>' + '</span>');
+      $('.filtres').append('<span style="display: block;margin-bottom: 2em;"></span><span id="divaffichertermine" style="margin-left: 12px">' + '<input ' + checkedShowDemandesDone + ' type="checkbox" name="affichertermine" id="affichertermine" style="position: relative; vertical-align: middle"/>' + '<label style="position: relative;display: inline-block;vertical-align: middle;" for="affichertermine" id="loaderTermine">Afficher les demandes terminées</label>' + '</span>');
 
       /**
        * Au cochage de la case, change le statut de la variable
@@ -197,7 +197,7 @@ function initDataTables() {
        * Au cochage de la case, agit sur le dom en remplaçant la phrase initiale du bouton
        */
       $('#divaffichertermine').change(function () {
-         document.getElementById('loaderTermine').innerHTML = '<span class="blink">Demandes terminées &#128472;</span>';
+         document.getElementById('loaderTermine').innerHTML = '<span class="blink">Afficher les demandes terminées &#128472;</span>';
          document.getElementById('loaderTermine').style.color = 'red';
          //Désactivation de la possibilité de recocher les cases pendant le chargement
          document.getElementById('affichertermine').disabled = true;
@@ -212,7 +212,7 @@ function initDataTables() {
        * @type filtres du dom
        */
       var checkedShowDemandesArchived = $('#show_demandes_archived').val() === 'true' || getCookieValue('jsSessionCookieKeepDisplayedDemandesArchived') === 'true' ? 'checked="checked" ' : '';
-      $('.filtres').append('<span id="divafficherarchive">' + '<input ' + checkedShowDemandesArchived + ' type="checkbox" name="afficherarchive" id="afficherarchive" style="position: relative; vertical-align: middle" />' + '<label style="position: relative;display: inline-block;vertical-align: middle;" for="afficherarchive" id="loaderArchive">Demandes archivées</label>' + '</span>');
+      $('.filtres').append('<span id="divafficherarchive">' + '<input ' + checkedShowDemandesArchived + ' type="checkbox" name="afficherarchive" id="afficherarchive" style="position: relative; vertical-align: middle" />' + '<label style="position: relative;display: inline-block;vertical-align: middle;" for="afficherarchive" id="loaderArchive">Afficher les demandes archivées</label>' + '</span>');
 
       $('#divafficherarchive').change(function () {
          checkbox_already_checked = true;
@@ -228,7 +228,7 @@ function initDataTables() {
        * Au cochage de la case, agit sur le dom en remplaçant la phrase initiale du bouton
        */
       $('#divafficherarchive').change(function () {
-         document.getElementById('loaderArchive').innerHTML = '<span class="blink">Demandes archivées &#128472;</span>';
+         document.getElementById('loaderArchive').innerHTML = '<span class="blink">Afficher les demandes archivées &#128472;</span>';
          document.getElementById('loaderArchive').style.color = 'red';
          //Désactivation de la possibilité de recocher les cases pendant le chargement
          document.getElementById('affichertermine').disabled = true;
@@ -491,14 +491,14 @@ Permet de lancer des évenements sur le dom à chaque fois que le tableau a fini
  */
 $('#liste_demande').on('xhr.dt', function () {
    if (checkbox_already_checked) {
-      document.getElementById('loaderTermine').innerHTML = 'Demandes terminées</span>';
+      document.getElementById('loaderTermine').innerHTML = 'Afficher les demandes terminées</span>';
       document.getElementById('loaderTermine').style.color = 'black';
       document.getElementById('affichertermine').disabled = false;
       document.getElementById('afficherarchive').disabled = false;
    }
 
    if (checkbox_already_checked) {
-      document.getElementById('loaderArchive').innerHTML = 'Demandes archivées</span>';
+      document.getElementById('loaderArchive').innerHTML = 'Afficher les demandes archivées</span>';
       document.getElementById('loaderArchive').style.color = 'black';
       document.getElementById('affichertermine').disabled = false;
       document.getElementById('afficherarchive').disabled = false;
