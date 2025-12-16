@@ -86,7 +86,7 @@
                                 <c:when
                                     test="${!(connexion.user.isdeploye)}">
                                     <option value="23">correction</option>
-                                    <option value="24">création de notice</option>
+<%--                                    <option value="24">création de notice</option>--%>
                                 </c:when>
                                 <c:otherwise>
                                     <option value="22">numérotation</option>
