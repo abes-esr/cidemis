@@ -26,7 +26,7 @@ public class JdbcTemplateDaoImpl implements IJdbcTemplateDao {
         String query = "SELECT * FROM TABLE(AUTORITES.CIDEMIS_NOTICE_BY_PPN(?))";
         CidemisNotices notice = new CidemisNotices();
         List<CidemisNoticesDto> liste =  jdbcTemplate.query(query, new Object[] {ppn}, new CidemisNoticesMapper());
-        if (liste.size() != 0) {
+        if (!liste.isEmpty()) {
             CidemisNoticesDto noticeBdd = liste.get(0);
             notice.setPpn(noticeBdd.getPpn());
             notice.setIssn(noticeBdd.getIssn());
@@ -55,10 +55,4 @@ public class JdbcTemplateDaoImpl implements IJdbcTemplateDao {
         return null;
     }
 
-    @Override
-    public Integer getIlnRattache(String rcr) {
-        String query = "select GET_ILN_RATTACHE(?) from dual";
-        Integer iln = jdbcTemplate.queryForObject(query, new Object[] {rcr}, Integer.class);
-        return iln;
-    }
 }

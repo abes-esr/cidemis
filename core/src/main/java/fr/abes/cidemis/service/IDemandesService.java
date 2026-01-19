@@ -60,8 +60,6 @@ public interface IDemandesService {
 
     Map<String, String> getDemandemap(Demandes demande);
 
-    void setCr(Demandes demande);
-
     void envoiMail(Demandes demande, CbsUsers user) throws JsonProcessingException;
 
 }

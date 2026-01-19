@@ -26,11 +26,11 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                     Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR,
                     Constant.ETAT_PRECISION_PAR_CATALOGUEUR
                     )) {
-                roles.add(service.getUsers().findRoles(Constant.ROLE_RESPONSABLE_CR));
+                roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
             }
             return roles;
 
-            case Constant.ROLE_RESPONSABLE_CR:
+            case Constant.ROLE_CORCAT:
             if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                     Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR,
                     Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR,
@@ -45,14 +45,14 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                         Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE
                 )){
-                    roles.add(service.getUsers().findRoles(Constant.ROLE_RESPONSABLE_CR));
+                    roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
                     roles.add(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR));
 
                 }
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                         Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR
                 )){
-                    roles.add(service.getUsers().findRoles(Constant.ROLE_RESPONSABLE_CR));
+                    roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
                 }
             return roles;
             default: return roles;

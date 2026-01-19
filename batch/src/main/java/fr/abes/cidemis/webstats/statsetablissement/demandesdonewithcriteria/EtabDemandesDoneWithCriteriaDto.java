@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter @Setter
 public class EtabDemandesDoneWithCriteriaDto {
-    private String ilnRattache;
+    private String iln;
     private String rcrDemandeur;
     private Integer idTypeDemande;
     private Integer idEtatDemande;

@@ -98,7 +98,7 @@ public class CidemisInitializer {
         mapColonnes.put(Constant.COL_PPN, Constant.COLTYPE_INPUT);
         mapColonnes.put(Constant.COL_TITRE, Constant.COLTYPE_INPUT);
         mapColonnes.put(Constant.COL_ETAT, Constant.COLTYPE_SELECT);
-        mapColonnes.put(Constant.COL_CENTRE_REGIONAL, Constant.COLTYPE_INPUT);
+        mapColonnes.put(Constant.COL_ILN, Constant.COLTYPE_INPUT);
         mapColonnes.put(Constant.COL_ISSN, Constant.COLTYPE_INPUT);
         mapColonnes.put(Constant.COL_FRBNF, Constant.COLTYPE_INPUT);
         mapColonnes.put(Constant.COL_PUBLICATION_TYPE, Constant.COLTYPE_SELECT);

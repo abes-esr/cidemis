@@ -15,7 +15,7 @@ public class EtabDemandesISSNState extends Export<EtabDemandesISSNStateDto> {
     @Override
     protected void lineToCSV(CSVWriter writer, EtabDemandesISSNStateDto dto) throws SQLException {
         writer.writeNext(new String[]{
-           dto.getIlnRattache(),
+           dto.getIln(),
            dto.getRcrDemandeur(),
            dto.getIdTypeDemande().toString(),
            dto.getStatus(),
@@ -27,7 +27,7 @@ public class EtabDemandesISSNState extends Export<EtabDemandesISSNStateDto> {
     protected List<EtabDemandesISSNStateDto> getQuery() {
         String query = "(" +
                 "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ID_TYPEDEMANDE, " +
                 "'DONE' AS STATUS, " +
@@ -38,12 +38,12 @@ public class EtabDemandesISSNState extends Export<EtabDemandesISSNStateDto> {
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.DATE_DEMANDE < ? " +
                 "GROUP BY " +
-                "d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, u.ILN_RATTACHE " +
+                "d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, u.ILN " +
                 ") " +
                 "UNION " +
                 "( " +
                 "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ID_TYPEDEMANDE, " +
                 "'ACTUAL' AS STATUS, " +
@@ -54,7 +54,7 @@ public class EtabDemandesISSNState extends Export<EtabDemandesISSNStateDto> {
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.DATE_DEMANDE < ? " +
                 "GROUP BY " +
-                "d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, u.ILN_RATTACHE " +
+                "d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, u.ILN " +
                 ")";
         return jdbcTemplate.query(query, new Object[] {dateStat, dateStat}, new EtabDemandesISSNStateMapper());
     }

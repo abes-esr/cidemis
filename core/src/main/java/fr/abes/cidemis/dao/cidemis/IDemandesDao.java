@@ -31,15 +31,15 @@ public interface IDemandesDao extends JpaRepository<Demandes, Integer> {
     @Query("select d from Demandes d left join fetch d.taggues where d.cbsUsers.userNum = :cbsUserNum")
     List<Demandes> findDemandesByCbsUsersAll(@Param("cbsUserNum") Integer cbsUserNum);
 
-    //Utilisateur ROLE RESPONSABLE_CR
-    @Query("select d from Demandes d left join fetch d.taggues where d.cr = :cr and d.etatsDemandes.idEtatDemande NOT IN(22, 36, 37, 38, 39)")
-    List<Demandes> findDemandesByCrExceptAchievedAndArchived(@Param("cr") String cr);
-    @Query("select d from Demandes d left join fetch d.taggues where d.cr = :cr and d.etatsDemandes.idEtatDemande NOT IN(22, 36, 37, 38)")
-    List<Demandes> findDemandesByCrExceptDone(@Param("cr") String cr);
-    @Query("select d from Demandes d left join fetch d.taggues where d.cr = :cr and d.etatsDemandes.idEtatDemande NOT IN(22, 39)")
-    List<Demandes> findDemandesByCrExceptArchived(@Param("cr") String cr);
-    @Query("select d from Demandes d left join fetch d.taggues where d.cr = :cr and d.etatsDemandes.idEtatDemande NOT IN(22)")
-    List<Demandes> findDemandesByCrAll(@Param("cr") String cr);
+    //Utilisateur ROLE CORCAT
+    @Query("select d from Demandes d left join fetch d.taggues where d.iln = :iln and d.etatsDemandes.idEtatDemande NOT IN(22, 36, 37, 38, 39)")
+    List<Demandes> findDemandesByIlnExceptAchievedAndArchived(@Param("iln") String iln);
+    @Query("select d from Demandes d left join fetch d.taggues where d.iln = :iln and d.etatsDemandes.idEtatDemande NOT IN(22, 36, 37, 38)")
+    List<Demandes> findDemandesByIlnExceptDone(@Param("iln") String iln);
+    @Query("select d from Demandes d left join fetch d.taggues where d.iln = :iln and d.etatsDemandes.idEtatDemande NOT IN(22, 39)")
+    List<Demandes> findDemandesByIlnExceptArchived(@Param("iln") String iln);
+    @Query("select d from Demandes d left join fetch d.taggues where d.iln = :iln and d.etatsDemandes.idEtatDemande NOT IN(22)")
+    List<Demandes> findDemandesByIlnAll(@Param("iln") String iln);
 
     //Utilisateur ROLE ISSN
     @Query("select d from Demandes d left join fetch d.taggues where d.notice.pays in ('FR', 'GF', 'GP', 'MQ', 'NC', 'PF' , 'PM', 'RE', 'SM', 'WF', 'YT') "

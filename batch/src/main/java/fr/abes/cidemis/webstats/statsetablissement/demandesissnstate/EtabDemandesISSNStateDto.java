@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter @Setter
 public class EtabDemandesISSNStateDto {
-    private String ilnRattache;
+    private String iln;
     private String rcrDemandeur;
     private Integer idTypeDemande;
     private String status;

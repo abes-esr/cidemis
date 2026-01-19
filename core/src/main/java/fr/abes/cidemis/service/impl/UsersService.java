@@ -194,12 +194,7 @@ public class UsersService implements fr.abes.cidemis.service.IUsersService {
                     user.setRoles(findRoles(userRole.getIdRole().getIdRole()));
                     user.setLibrary(registryUser.getLibrary());
                     user.setIln(registryUser.getIln());
-                    Integer ilnRattache = jdbcTemplateDao.getIlnRattache(registryUser.getLibrary());
-                    if (ilnRattache != null) {
-                        user.setIlnRattache(ilnRattache.toString());
-                    } else {
-                        user.setIlnRattache(registryUser.getIln());
-                    }
+
                     // On save l'utilisateur dans la bdd Cidemis
                     save(user);
                     user = findCbsUsers(user.getUserNum());
@@ -227,19 +222,12 @@ public class UsersService implements fr.abes.cidemis.service.IUsersService {
                     return null;
                 } else {
                     CbsUsers user = findCbsUsersByUserKey(registryUser.getUserKey());
-                    Integer ilnRattache = jdbcTemplateDao.getIlnRattache(registryUser.getLibrary());
                     user.setUserGroup(registryUser.getUserGroup());
                     user.setShortName(registryUser.getShortName());
                     user.setLibrary(registryUser.getLibrary());
                     user.setEditDate(new java.util.Date());
                     user.setRoles(findRoles(userRole.getIdRole().getIdRole()));
                     user.setIln(registryUser.getIln());
-
-                    if (ilnRattache != null) {
-                        user.setIlnRattache(ilnRattache.toString());
-                    } else {
-                        user.setIlnRattache(registryUser.getIln());
-                    }
                     save(user);
 
                     // On save l'utilisateur dans la bdd Cidemis
@@ -442,13 +430,9 @@ public class UsersService implements fr.abes.cidemis.service.IUsersService {
     @Override
     public List<CbsUsers> findCbsUsersToSendEmail(Demandes demande, Roles roles) {
         List<CbsUsers> cbsUsersList = new ArrayList<>();
-        if (roles.getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
+        if (roles.getIdRole().equals(Constant.ROLE_CATALOGUEUR) || (roles.getIdRole().equals(Constant.ROLE_CORCAT))) {
             //si on envoie le mail au catalogueur, il s'agit du créateur de la demande
             cbsUsersList.add(demande.getCbsUsers());
-        } else {
-            //si on envoie le mail au responsable CR on récupère l'utilisateur du groupe cbs crcat dont l'iln rattaché correspond à l'iln rattache du centre issn de la demande
-            if (roles.getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
-                cbsUsersList.addAll(dao.getCbsUsersDao().findAllByIlnRattacheAndUserGroup(dao.getCrIlnDao().findAllByCr(demande.getCr()).getIln(), "crcat"));
         }
         return cbsUsersList;
     }

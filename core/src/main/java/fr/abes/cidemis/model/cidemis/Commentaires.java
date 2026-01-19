@@ -45,14 +45,14 @@ public class Commentaires implements Serializable {
 		
 		if (user.getUserKey().compareTo(this.getCbsUsers().getUserKey()) == 0) {
 			if (user.getRoles().getIdRole().compareTo(Constant.ROLE_CATALOGUEUR) == 0 && (
-					this.getDemande().getEtatsDemandes().getIdEtatDemande().intValue() == Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR
-					|| this.getDemande().getEtatsDemandes().getIdEtatDemande().intValue() == Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
+                    this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR
+					|| this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
 					)) {
 				updatable = true;
 			}
-			if (user.getRoles().getIdRole().compareTo(Constant.ROLE_RESPONSABLE_CR) == 0 && (
-					this.getDemande().getEtatsDemandes().getIdEtatDemande().intValue() == Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR
-					|| this.getDemande().getEtatsDemandes().getIdEtatDemande().intValue() == Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR
+			if (user.getRoles().getIdRole().compareTo(Constant.ROLE_CORCAT) == 0 && (
+                    this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR
+					|| this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR
 					)) {
 				updatable = true;
 			}

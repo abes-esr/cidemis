@@ -35,8 +35,6 @@ public class CbsUsers implements Serializable {
     private String iln;
 	@Column(name = "ID_PROFIL")
     private Integer idProfil;
-	@Column(name = "ILN_RATTACHE")
-	private String ilnRattache;
 	@ManyToOne
 	@JoinColumn(name = "ID_ROLE")
 	private Roles roles;

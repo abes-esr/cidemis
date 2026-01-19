@@ -148,8 +148,8 @@ public class DemandesService implements IDemandesService {
             demandesList = this.dao.getDemandesDao().findAllExceptAchievedAndArchived();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
             demandesList = this.dao.getDemandesDao().findDemandesByCbsUsersExceptAchievedAndArchived(cbsUsers.getUserNum()); //Voir avec pierre
-        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
-            demandesList = this.dao.getDemandesDao().findDemandesByCrExceptAchievedAndArchived(dao.getCrIlnDao().getCrIlnByIln(cbsUsers.getIln()).get().getCr());
+        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
+            demandesList = this.dao.getDemandesDao().findDemandesByIlnExceptAchievedAndArchived(cbsUsers.getIln());
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_ISSN))
             demandesList = this.dao.getDemandesDao().findDemandesISSNExceptAchievedAndArchived();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CIEPS))
@@ -163,8 +163,8 @@ public class DemandesService implements IDemandesService {
             demandesList = this.dao.getDemandesDao().findAllExceptDone();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
             demandesList = this.dao.getDemandesDao().findDemandesByCbsUsersExceptDone(cbsUsers.getUserNum());
-        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
-            demandesList = this.dao.getDemandesDao().findDemandesByCrExceptDone(dao.getCrIlnDao().getCrIlnByIln(cbsUsers.getIln()).get().getCr());
+        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
+            demandesList = this.dao.getDemandesDao().findDemandesByIlnExceptDone(cbsUsers.getIln());
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_ISSN))
             demandesList = this.dao.getDemandesDao().findDemandesISSNExceptDone();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CIEPS))
@@ -178,8 +178,8 @@ public class DemandesService implements IDemandesService {
             demandesList = this.dao.getDemandesDao().findAllExceptArchived();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
             demandesList = this.dao.getDemandesDao().findDemandesByCbsUsersExceptArchived(cbsUsers.getUserNum());
-        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
-            demandesList = this.dao.getDemandesDao().findDemandesByCrExceptArchived(dao.getCrIlnDao().getCrIlnByIln(cbsUsers.getIln()).get().getCr());
+        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
+            demandesList = this.dao.getDemandesDao().findDemandesByIlnExceptArchived(cbsUsers.getIln());
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_ISSN))
             demandesList = this.dao.getDemandesDao().findDemandesISSNExceptArchived();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CIEPS))
@@ -193,8 +193,8 @@ public class DemandesService implements IDemandesService {
             demandesList = this.dao.getDemandesDao().findAll();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
             demandesList = this.dao.getDemandesDao().findDemandesByCbsUsersAll(cbsUsers.getUserNum());
-        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
-            demandesList = this.dao.getDemandesDao().findDemandesByCrAll(dao.getCrIlnDao().getCrIlnByIln(cbsUsers.getIln()).get().getCr());
+        else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
+            demandesList = this.dao.getDemandesDao().findDemandesByIlnAll(cbsUsers.getIln());
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_ISSN))
             demandesList = this.dao.getDemandesDao().findDemandesISSNAll();
         else if (cbsUsers.getRoles().getIdRole().equals(Constant.ROLE_CIEPS))
@@ -258,8 +258,8 @@ public class DemandesService implements IDemandesService {
             case Constant.ROLE_CATALOGUEUR:
                 return demande.getCbsUsers().getUserNum().equals(user.getUserNum()) && demande.isStateIn(new int[]{
                         Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR, Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR});
-            case Constant.ROLE_RESPONSABLE_CR:
-                return demande.getCbsUsers().getIlnRattache().equals(user.getIlnRattache())
+            case Constant.ROLE_CORCAT:
+                return demande.getIln().equals(user.getIln())
                         && (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR)
                         || demande.isStateIn(new int[]{Constant.ETAT_PRECISION_PAR_CATALOGUEUR,
                         Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR,
@@ -282,7 +282,7 @@ public class DemandesService implements IDemandesService {
     public boolean canUserArchiveDemande(CbsUsers user, Demandes demande) {
         switch (user.getRoles().getIdRole()) {
             case Constant.ROLE_ABES:
-            case Constant.ROLE_RESPONSABLE_CR:
+            case Constant.ROLE_CORCAT:
                 return ((demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) ||
                         (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE)) ||
                         (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)));
@@ -313,7 +313,7 @@ public class DemandesService implements IDemandesService {
             canDelete = true;
         }
         // SI c'est un responsable CR
-        else if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+        else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
             canDelete = demande.getEtatsDemandes().getIdEtatDemande()
                     .equals(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR)
                     && demande.getCbsUsers().getUserNum().equals(user.getUserNum());
@@ -588,18 +588,18 @@ public class DemandesService implements IDemandesService {
         demande.setDateDemande(new Date());
         demande.setRcrDemandeur(user.getLibrary());
         demande.setCbsUsers(user);
-        service.getDemande().setCr(demande);
+        demande.setIln(user.getIln());
 
         if ("valider".equals(this.demandeDto.getAction())) {
             if (user.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
                 this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR), demande);
-            } else if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+            } else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                 demande.setIdProfil(demande.getNotice().getIdprofil());
                 demande = setEtatISSN(demande, false);
                 this.setCentreISSN(demande, false);
             }
         } else if ("creernotice".equals(this.demandeDto.getAction())) {
-            if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+            if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                 demande.setIdProfil(demande.getNotice().getIdprofil());
                 demande.setTypesDemandes(service.getReference().findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
                 demande = setEtatISSN(demande, false);
@@ -608,7 +608,7 @@ public class DemandesService implements IDemandesService {
         } else {
             if (user.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
                 this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR), demande);
-            } else if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+            } else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                 this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR), demande);
             }
         }
@@ -621,7 +621,6 @@ public class DemandesService implements IDemandesService {
      */
     private Demandes processUpdateDemande(CbsUsers user) throws RestClientException {
         Demandes demande = service.getDemande().findDemande(this.demandeDto.getIdDemande());
-        service.getDemande().setCr(demande);
         demande.setNotice(service.getTools().findCidemisNotice(this.demandeDto.getPpn()));
         if (demande != null && service.getDemande().canUserModifyDemande(user, demande)) {
             if ("valider".equals(this.demandeDto.getAction())) {
@@ -675,7 +674,7 @@ public class DemandesService implements IDemandesService {
                         break;
                 }
             } else if ("creernotice".equals(this.demandeDto.getAction())) {
-                if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+                if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                     demande.setIdProfil(demande.getNotice().getIdprofil());
                     demande.setTypesDemandes(
                             service.getReference().findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
@@ -912,7 +911,8 @@ public class DemandesService implements IDemandesService {
     private void updateCBSValidated(NoticeHelper noticehelper, String idCidemis, Demandes demande, CbsUsers user) throws CBSException, ZoneException, IOException {
         String auteur;
         String dateNowFormat = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        if (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
+        if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
+            //TODO : remplacer par l'ILN
             auteur = "CR " + demande.getCr();
         else
             auteur = user.getShortName();
@@ -944,7 +944,7 @@ public class DemandesService implements IDemandesService {
         // Mise à jour des zones si je les ai trouvés et que c'est le bon role
         if (!zoneExist && !zone.isEmpty() && user.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
             noticehelper.ajoutZoneNotice(demande.getNotice().getPpn(), zone, "$a", textCatalogueur);
-        } else if (!zone.isEmpty() && user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)) {
+        } else if (!zone.isEmpty() && user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
             if (!zoneExist) {
                 noticehelper.ajoutZoneNotice(demande.getNotice().getPpn(), zone, "$a", textCR);
             } else {
@@ -1120,12 +1120,6 @@ public class DemandesService implements IDemandesService {
         }
     }
 
-    @Override
-    public void setCr(Demandes demande) {
-        Optional<CrIln> crIln = dao.getCrIlnDao().getCrIlnByIln(demande.getCbsUsers().getIlnRattache());
-        demande.setCr((crIln.isPresent()) ? crIln.get().getCr() : "");
-    }
-
     // Utilisé pour optimiser le temps d'affichage du tableau de bord
     public Map<String, String> getDemandemap(Demandes demande) {
         Map<String, String> demandeMap = new HashMap<>();
@@ -1151,7 +1145,7 @@ public class DemandesService implements IDemandesService {
         demandeMap.put("col_ppn", (demande.getNotice() != null) ? demande.getNotice().getPpn() : "");
         demandeMap.put("col_titre", demande.getTitre());
         demandeMap.put("col_etat", demande.getEtatsDemandes().getLibelleEtatDemande());
-        demandeMap.put("col_centre_regional", demande.getCr());
+        demandeMap.put("col_iln", demande.getIln());
         demandeMap.put("col_issn", demande.getConditionnalIssn());
         demandeMap.put("col_frbnf", (demande.getNotice() != null) ? demande.getNotice().getFrbnf() : "");
         demandeMap.put("col_publication_type", (demande.getNotice() != null) ? demande.getNotice().getTypeRessource() : "");

@@ -47,7 +47,7 @@
                     <label>Créateur de la demande : </label><span>${demande.cbsUsers.shortName}</span><br/>
                     <label>Rôle du créateur de la demande : </label><span>${demande.cbsUsers.roles.libRole}</span><br/>
                     <c:if
-                            test="${connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR && connexion.user.userNum ne demande.cbsUsers.userNum }">
+                            test="${connexion.user.roles.idRole eq Constant.ROLE_CORCAT && connexion.user.userNum ne demande.cbsUsers.userNum }">
                         <label>Email du créateur de la demande : </label>
                         <span>${demande.cbsUsers.userEmail}</span>
                         <br/>
@@ -104,7 +104,7 @@
                     </c:choose>
                 </fieldset>
                 <c:if
-                        test="${not empty demandes_with_same_ppn.demandesList && (connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR || connexion.user.roles.idRole eq Constant.ROLE_ABES)}">
+                        test="${not empty demandes_with_same_ppn.demandesList && (connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_CORCAT || connexion.user.roles.idRole eq Constant.ROLE_ABES)}">
                     <fieldset>
                         <legend>Demandes antérieures sur la notice</legend>
                         <div id="lierdemandediv">
@@ -143,7 +143,7 @@
                     <br/>
                 </c:if>
                 <c:if
-                        test="${(connexion.user.roles.idRole == Constant.ROLE_RESPONSABLE_CR) && demande.cbsUsers.roles.idRole == Constant.ROLE_RESPONSABLE_CR}">
+                        test="${(connexion.user.roles.idRole == Constant.ROLE_CORCAT) && demande.cbsUsers.roles.idRole == Constant.ROLE_CORCAT}">
                     <fieldset>
                         <legend>RCR demandeur</legend>
                         <input type="text" name="num_RCR" id="num_RCR" maxlength="10"
@@ -214,7 +214,7 @@
                     </fieldset>
                 </c:if>
                 <c:if
-                        test="${demande.typesDemandes.idTypeDemande eq Constant.TYPE_DEMANDE_CREATION && connexion.user.roles.idRole == Constant.ROLE_RESPONSABLE_CR}">
+                        test="${demande.typesDemandes.idTypeDemande eq Constant.TYPE_DEMANDE_CREATION && connexion.user.roles.idRole == Constant.ROLE_CORCAT}">
                     <fieldset>
                         <legend>PPN</legend>
                         <input type="text" name="num_ppn" id="num_ppn"
@@ -343,7 +343,7 @@
                                                 ${p.cbsUsers.roles.libRole} ) : <a
                                                 href="${p.urlfichier}">${p.publicname}</a>
                                             <c:if
-                                                    test="${((p.cbsUsers.userNum eq connexion.user.userNum) || (connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR)) && p.demande.idDemande eq demande.idDemande}">
+                                                    test="${((p.cbsUsers.userNum eq connexion.user.userNum) || (connexion.user.roles.idRole eq Constant.ROLE_CORCAT)) && p.demande.idDemande eq demande.idDemande}">
                                                 <button fileid="${p.idPiece}"
                                                         class="formbutton supprimerfichierup "
                                                         title="Supprimer le fichier" type="button">
@@ -424,7 +424,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande"
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -483,7 +483,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -573,7 +573,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -632,7 +632,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
