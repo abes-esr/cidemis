@@ -9,7 +9,7 @@ public class EtabDemandesISSNWithCriteriaActivityMapper implements RowMapper<Eta
     @Override
     public EtabDemandesISSNWithCriteriaActivityDto mapRow(ResultSet resultSet, int i) throws SQLException {
         EtabDemandesISSNWithCriteriaActivityDto demande = new EtabDemandesISSNWithCriteriaActivityDto();
-        demande.setIlnRattache(resultSet.getString("ILN_RATTACHE"));
+        demande.setIln(resultSet.getString("ILN"));
         demande.setRcrDemandeur(resultSet.getString("RCR_DEMANDEUR"));
         demande.setIdTypeDemande(resultSet.getInt("ID_TYPEDEMANDE"));
         demande.setStatus(resultSet.getString("STATUS"));

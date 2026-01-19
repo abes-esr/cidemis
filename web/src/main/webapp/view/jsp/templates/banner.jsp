@@ -74,7 +74,7 @@
             <div title="Tableau de bord" class="sidebar-toggler"></div>
         </li>
         <!-- Création d'une nouvelle demande -->
-        <c:if test="${connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR || connexion.user.roles.idRole eq Constant.ROLE_ABES}">
+        <c:if test="${connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_CORCAT || connexion.user.roles.idRole eq Constant.ROLE_ABES}">
             <li class="has-sub demande">
                 <a href="javascript:;">
                     <i class="icon-document"></i> <span class="title">Nouvelle demande</span> <span class="arrow"></span>

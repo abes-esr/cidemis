@@ -16,8 +16,6 @@ public interface ICbsUsersDao extends JpaRepository<CbsUsers, Integer> {
 
     CbsUsers findCbsUsersByUserKey(String userKey);
 
-    List<CbsUsers> findAllByIlnRattacheAndUserGroup(String ilnRattache, String userGroup);
-
     @Query("select case when (count(user) > 0)  then true else false end from CbsUsers user where user.userKey = :userKey")
     boolean knowIfUserIsCreated(@Param("userKey") String userKey);
 }

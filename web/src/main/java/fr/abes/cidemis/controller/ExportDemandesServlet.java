@@ -140,7 +140,7 @@ public class ExportDemandesServlet extends AbstractServlet {
                     case Constant.COL_ETAT:
                         csv.append(c + demande.getEtatsDemandes().getLibelleEtatDemande());
                         break;
-                    case Constant.COL_CENTRE_REGIONAL:
+                    case Constant.COL_ILN:
                         csv.append(c + demande.getCr());
                         break;
                     case Constant.COL_ISSN:
