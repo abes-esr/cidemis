@@ -15,7 +15,7 @@ public class EtabDemandesISSNActivity extends Export<EtabDemandesISSNActivityDto
     @Override
     protected void lineToCSV(CSVWriter writer, EtabDemandesISSNActivityDto dto) throws SQLException {
         writer.writeNext(new String[]{
-                dto.getIlnRattache(),
+                dto.getIln(),
                 dto.getRcrDemandeur(),
                 dto.getIdTypeDemande().toString(),
                 dto.getIdEtatDemande(),
@@ -26,7 +26,7 @@ public class EtabDemandesISSNActivity extends Export<EtabDemandesISSNActivityDto
     @Override
     protected List<EtabDemandesISSNActivityDto> getQuery() {
         String query = "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ID_TYPEDEMANDE, " +
                 "d.ID_ETATDEMANDE, " +
@@ -35,7 +35,7 @@ public class EtabDemandesISSNActivity extends Export<EtabDemandesISSNActivityDto
                 "WHERE d.DATE_DEMANDE BETWEEN ADD_MONTHS( ? , -1) AND ? " +
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.ID_ETATDEMANDE IN (25, 26, 33, 36, 37, 38) " +
-                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, d.ID_ETATDEMANDE, u.ILN_RATTACHE";
+                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, d.ID_ETATDEMANDE, u.ILN";
         return jdbcTemplate.query(query, new Object[] {dateStat, dateStat}, new EtabDemandesISSNActivityMapper());
 
     }

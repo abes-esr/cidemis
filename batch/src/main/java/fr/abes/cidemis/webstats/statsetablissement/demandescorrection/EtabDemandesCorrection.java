@@ -16,7 +16,7 @@ public class EtabDemandesCorrection extends Export<EtabDemandesCorrectionDto> {
     @Override
     protected void lineToCSV(CSVWriter writer, EtabDemandesCorrectionDto dto) throws SQLException {
         writer.writeNext(new String[]{
-                dto.getIlnRattache(),
+                dto.getIln(),
                 dto.getRcrDemandeur(),
                 dto.getZones(),
                 getStatus(dto.getIdEtatDemande()),
@@ -47,7 +47,7 @@ public class EtabDemandesCorrection extends Export<EtabDemandesCorrectionDto> {
     @Override
     protected List<EtabDemandesCorrectionDto> getQuery() {
         String query = "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ZONES, " +
                 "d.ID_ETATDEMANDE, " +
@@ -57,7 +57,7 @@ public class EtabDemandesCorrection extends Export<EtabDemandesCorrectionDto> {
                 "WHERE d.DATE_DEMANDE < ? " +
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.ID_TYPEDEMANDE = 23" +
-                "GROUP BY d.RCR_DEMANDEUR, d.ZONES, d.ID_ETATDEMANDE, u.ILN_RATTACHE"
+                "GROUP BY d.RCR_DEMANDEUR, d.ZONES, d.ID_ETATDEMANDE, u.ILN"
                 ;
         return jdbcTemplate.query(query, new Object[] {dateStat}, new EtabDemandesCorrectionMapper());
 

@@ -15,7 +15,7 @@ public class EtabDemandesISSNWithCriteriaActivity extends Export<EtabDemandesISS
     @Override
     protected void lineToCSV(CSVWriter writer, EtabDemandesISSNWithCriteriaActivityDto dto) throws SQLException {
         writer.writeNext(new String[]{
-                dto.getIlnRattache(),
+                dto.getIln(),
                 dto.getRcrDemandeur(),
                 dto.getIdTypeDemande().toString(),
                 dto.getStatus(),
@@ -31,7 +31,7 @@ public class EtabDemandesISSNWithCriteriaActivity extends Export<EtabDemandesISS
     protected List<EtabDemandesISSNWithCriteriaActivityDto> getQuery() {
         String query = "(" +
                 "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ID_TYPEDEMANDE, " +
                 "'DONE' AS STATUS, " +
@@ -46,12 +46,12 @@ public class EtabDemandesISSNWithCriteriaActivity extends Export<EtabDemandesISS
                 "AND d.PPN = n.ppn " +
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.DATE_DEMANDE BETWEEN ADD_MONTHS( ? , -1) AND ? " +
-                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, n.PAYS, n.TYPE_DOCUMENT, n.TYPE_RESSOURCE_CONTINUE, n.DATE_FIN, u.ILN_RATTACHE " +
+                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, n.PAYS, n.TYPE_DOCUMENT, n.TYPE_RESSOURCE_CONTINUE, n.DATE_FIN, u.ILN " +
                 ")" +
                 " UNION " +
                 "(" +
                 "SELECT " +
-                "u.ILN_RATTACHE, " +
+                "u.ILN, " +
                 "d.RCR_DEMANDEUR, " +
                 "d.ID_TYPEDEMANDE, " +
                 "'ACTUAL' AS STATUS, " +
@@ -66,7 +66,7 @@ public class EtabDemandesISSNWithCriteriaActivity extends Export<EtabDemandesISS
                 "AND d.PPN = n.ppn " +
                 "AND u.USER_NUM = d.USER_NUM " +
                 "AND d.DATE_DEMANDE BETWEEN ADD_MONTHS( ? , -1) AND ? " +
-                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, n.PAYS, n.TYPE_DOCUMENT, n.TYPE_RESSOURCE_CONTINUE, n.DATE_FIN, u.ILN_RATTACHE " +
+                "GROUP BY d.RCR_DEMANDEUR, d.ID_TYPEDEMANDE, n.PAYS, n.TYPE_DOCUMENT, n.TYPE_RESSOURCE_CONTINUE, n.DATE_FIN, u.ILN " +
                 ")";
         return jdbcTemplate.query(query, new Object[]{dateStat, dateStat, dateStat, dateStat}, new EtabDemandesISSNWithCriteriaActivityMapper());
     }

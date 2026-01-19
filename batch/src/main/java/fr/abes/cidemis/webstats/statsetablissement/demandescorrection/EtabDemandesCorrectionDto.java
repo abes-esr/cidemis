@@ -7,7 +7,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter @Setter
 public class EtabDemandesCorrectionDto {
-    String ilnRattache;
+    String iln;
     String rcrDemandeur;
     String zones;
     Integer idEtatDemande;

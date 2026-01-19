@@ -149,7 +149,7 @@ public class DemandeController extends AbstractServlet {
                 demande.setCbsUsers(connexion.getUser());
                 demande.setTypesDemandes(getService().getReference().findTypesdemandes(Constant.TYPE_DEMANDE_CREATION));
                 demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
-                service.getDemande().setCr(demande);
+                demande.setIln(connexion.getUser().getIln());
                 request.setAttribute("demande", demande);
                 request.setAttribute("type_demande", getService().getReference().findTypesdemandes(typeDemande));
 
@@ -165,7 +165,7 @@ public class DemandeController extends AbstractServlet {
                     Demandes demande = new Demandes();
                     if (connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
                         demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
-                    else if (connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR))
+                    else if (connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
                         demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR));
 
                     demande.setDateDemande(new Date());
@@ -175,7 +175,7 @@ public class DemandeController extends AbstractServlet {
                     demande.setRcrDemandeur(connexion.getUser().getLibrary());
                     demande.setPiecesJustificativeslist(new ArrayList<>());
                     demande.setTitre(notice.getTitre());
-                    service.getDemande().setCr(demande);
+                    demande.setIln(connexion.getUser().getIln());
 
                     request.setAttribute("demande", demande);
                     // Si on est dans le contexte d'une requête ajax (utilisé par le système de popup), on informe le navigateur qu'il doit renvoyer le formulaire sans requête ajax
@@ -284,7 +284,7 @@ public class DemandeController extends AbstractServlet {
             NoticeHelper noticehelper = new NoticeHelper(cbs);
 
             if (service.getDemande().canUserDeleteDemande(connexion.getUser(), demande)) {
-                if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC") && !connexion.getUser().getRoles().equals(Constant.ROLE_CATALOGUEUR)) {
+                if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC") && !connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
                     if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
                         noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "301", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
                     else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))

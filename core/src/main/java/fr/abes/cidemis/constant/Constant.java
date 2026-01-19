@@ -58,7 +58,7 @@ public class Constant implements Serializable {
 	public static final int ETAT_ARCHIVEE = 39;
 
 	public static final int ROLE_CATALOGUEUR = 1;
-	public static final int ROLE_RESPONSABLE_CR = 2;
+	public static final int ROLE_CORCAT = 2;
 	public static final int ROLE_ABES = 3;
 	public static final int ROLE_ISSN = 4;
 	public static final int ROLE_CIEPS = 5;
@@ -108,7 +108,7 @@ public class Constant implements Serializable {
 	public static final String COL_PPN = "col_ppn";
 	public static final String COL_TITRE = "col_titre";
 	public static final String COL_ETAT = "col_etat";
-	public static final String COL_CENTRE_REGIONAL = "col_centre_regional";
+	public static final String COL_ILN = "col_iln";
 	public static final String COL_ISSN = "col_issn";
 	public static final String COL_FRBNF = "col_frbnf";
 	public static final String COL_PUBLICATION_TYPE = "col_publication_type";

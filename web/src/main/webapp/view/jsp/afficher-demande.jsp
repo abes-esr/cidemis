@@ -24,7 +24,7 @@
 						<label>Créateur de la demande : </label><span>${demande.cbsUsers.shortName}</span><br />
 						<label>Rôle du créateur de la demande : </label><span>${demande.cbsUsers.roles.libRole}</span><br />
 						<c:if
-							test="${connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR && connexion.user.userNum ne demande.cbsUsers.userNum }">
+							test="${connexion.user.roles.idRole eq Constant.ROLE_CORCAT && connexion.user.userNum ne demande.cbsUsers.userNum }">
 							<label>Email du créateur de la demande : </label>
 							<span>${demande.cbsUsers.userEmail}</span>
 							<br />
@@ -83,7 +83,7 @@
 								value="${demande.etatsDemandes.libelleEtatDemande}" /></span><br />
 					</fieldset>
 					<c:if
-						test="${not empty demandes_with_same_ppn.demandesList && (connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_RESPONSABLE_CR || connexion.user.roles.idRole eq Constant.ROLE_ABES)}">
+						test="${not empty demandes_with_same_ppn.demandesList && (connexion.user.roles.idRole eq Constant.ROLE_CATALOGUEUR || connexion.user.roles.idRole eq Constant.ROLE_CORCAT || connexion.user.roles.idRole eq Constant.ROLE_ABES)}">
 						<fieldset>
 							<legend>Demandes antérieures sur la notice</legend>
 							<div id="lierdemandediv">

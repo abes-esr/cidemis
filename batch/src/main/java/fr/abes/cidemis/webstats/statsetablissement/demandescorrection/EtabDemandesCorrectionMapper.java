@@ -9,7 +9,7 @@ public class EtabDemandesCorrectionMapper implements RowMapper<EtabDemandesCorre
     @Override
     public EtabDemandesCorrectionDto mapRow(ResultSet resultSet, int i) throws SQLException {
         EtabDemandesCorrectionDto demande = new EtabDemandesCorrectionDto();
-        demande.setIlnRattache(resultSet.getString("ILN_RATTACHE"));
+        demande.setIln(resultSet.getString("ILN"));
         demande.setRcrDemandeur(resultSet.getString("RCR_DEMANDEUR"));
         demande.setZones(resultSet.getString("ZONES"));
         demande.setIdEtatDemande(resultSet.getInt("ID_ETATDEMANDE"));

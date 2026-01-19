@@ -9,7 +9,7 @@ public class EtabDemandesISSNStateMapper implements RowMapper<EtabDemandesISSNSt
     @Override
     public EtabDemandesISSNStateDto mapRow(ResultSet resultSet, int i) throws SQLException {
         EtabDemandesISSNStateDto demande = new EtabDemandesISSNStateDto();
-        demande.setIlnRattache(resultSet.getString("ILN_RATTACHE"));
+        demande.setIln(resultSet.getString("ILN"));
         demande.setRcrDemandeur(resultSet.getString("RCR_DEMANDEUR"));
         demande.setIdTypeDemande(resultSet.getInt("ID_TYPEDEMANDE"));
         demande.setStatus(resultSet.getString("STATUS"));

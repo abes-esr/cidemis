@@ -9,7 +9,7 @@ public class EtabDemandesDoneWithCriteriaMapper implements RowMapper<EtabDemande
     @Override
     public EtabDemandesDoneWithCriteriaDto mapRow(ResultSet resultSet, int i) throws SQLException {
         EtabDemandesDoneWithCriteriaDto demande = new EtabDemandesDoneWithCriteriaDto();
-        demande.setIlnRattache(resultSet.getString("ILN_RATTACHE"));
+        demande.setIln(resultSet.getString("ILN"));
         demande.setRcrDemandeur(resultSet.getString("RCR_DEMANDEUR"));
         demande.setIdTypeDemande(resultSet.getInt("ID_TYPEDEMANDE"));
         demande.setIdEtatDemande(resultSet.getInt("ID_ETATDEMANDE"));

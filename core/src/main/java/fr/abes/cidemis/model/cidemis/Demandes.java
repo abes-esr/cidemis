@@ -76,6 +76,8 @@ public class Demandes implements Serializable {
     private String titre;
     @Column(name = "CR")
     private String cr;
+    @Column(name="ILN")
+    private String iln;
 
     public Demandes(Integer id) {
         this.idDemande = id;
@@ -147,7 +149,7 @@ public class Demandes implements Serializable {
                 || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL)
                 || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR))
             return !Constant.getCodePaysFr().contains(this.getNotice().getPays())
-                    && (user.getRoles().getIdRole().equals(Constant.ROLE_RESPONSABLE_CR)
+                    && (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)
                     || user.getRoles().getIdRole().equals(Constant.ROLE_ISSN));
         return false;
     }
