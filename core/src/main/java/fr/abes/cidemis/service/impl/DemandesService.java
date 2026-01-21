@@ -312,7 +312,7 @@ public class DemandesService implements IDemandesService {
         else if (user.getRoles().getIdRole().equals(Constant.ROLE_ABES)) {
             canDelete = true;
         }
-        // SI c'est un responsable CR
+        // SI c'est un correspondant catalogage
         else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
             canDelete = demande.getEtatsDemandes().getIdEtatDemande()
                     .equals(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR)
@@ -497,7 +497,7 @@ public class DemandesService implements IDemandesService {
         this.path = path;
         this.demandeDto = demandeDto;
         CidemisNotices notice;
-        // Ce ppn peut être ajouté par le CR dans le cadre d'une demande de
+        // Ce ppn peut être ajouté par le CorCat dans le cadre d'une demande de
         // création de notice, le paramètre numPPN sera alors rempli avec le ppn
         // de la notice nouvellement créée
         if (this.demandeDto.getNumPpn() != null && this.demandeDto.getNumPpn().matches("(\\d{9})|((?i)\\d{8}X{1})")) {
@@ -824,7 +824,7 @@ public class DemandesService implements IDemandesService {
                 for (String filetodelete : this.demandeDto.getFilesToDelete()) {
                     for (PiecesJustificatives j : justificatifs) {
                         // Si l'utilisateur qui a uploadé le fichier est le même que
-                        // celui voulant le supprimer alors c'est OK | Le CR a le
+                        // celui voulant le supprimer alors c'est OK | Le CorCat a le
                         // droit de tout supprimer
                         if (j.getIdPiece() == Integer.parseInt(filetodelete)
                                 && (j.getCbsUsers().getUserNum().equals(user.getUserNum())
@@ -902,7 +902,7 @@ public class DemandesService implements IDemandesService {
     // /////////////////////////////////////////////
 
     /**
-     * Mets à jour la notice dans le cas d'une validation par CR ou Catalogueur
+     * Mets à jour la notice dans le cas d'une validation par CorCat ou Catalogueur
      *
      * @param noticehelper
      * @param idCidemis
@@ -912,8 +912,7 @@ public class DemandesService implements IDemandesService {
         String auteur;
         String dateNowFormat = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
-            //TODO : remplacer par l'ILN
-            auteur = "CR " + demande.getCr();
+            auteur = "ILN " + demande.getIln();
         else
             auteur = user.getShortName();
 
@@ -1006,7 +1005,7 @@ public class DemandesService implements IDemandesService {
     }
 
     /**
-     * Mets à jour la notice dans le cas d'un refus de la part d'un CR
+     * Mets à jour la notice dans le cas d'un refus de la part d'un CorCat
      *
      * @param noticehelper
      * @param idCidemis
