@@ -43,8 +43,6 @@ public class CidemisDaoProvider {
     private IJdbcTemplateDao cidemisTableDao;
     @Resource
     private IToolsDao toolsDao;
-    @Resource
-    private ICrIlnDao crIlnDao;
 
 
 

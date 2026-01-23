@@ -7,7 +7,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,15 +20,9 @@ import java.util.List;
 
 @Controller
 public class VerifNoticeDemande extends AbstractServlet {
-    @Autowired
-    DemandeController demandeController;
+
     @Value("${cidemis.url}")
     private String url;
-
-    @Override
-    protected boolean checkSession() {
-        return true;
-    }
 
     @PostMapping(value = "/verifnoticedemande")
     public Object verifNoticeDemande(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
@@ -39,8 +32,8 @@ public class VerifNoticeDemande extends AbstractServlet {
         
         if (!"-1".equals(demandeNum)) {
             Demandes demande = getService().getDemande().findDemande(Integer.parseInt(demandeNum));
-            List<String> zonesManquantes = new ArrayList();
-            List<String> zonesPresentes = new ArrayList();
+            List<String> zonesManquantes = new ArrayList<>();
+            List<String> zonesPresentes = new ArrayList<>();
             String errorCode;
             
             // Vérification de la demande

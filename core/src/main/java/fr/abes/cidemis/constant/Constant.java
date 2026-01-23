@@ -14,11 +14,6 @@ public class Constant implements Serializable {
 
 	public static final String ENCODE = "UTF-8";
 
-	public static final String PROD = "PROD";
-	public static final String TEST = "TEST";
-	public static final String DEV = "DEV";
-	public static final String LOCAL = "LOCAL";
-
 	/**
 	 * *******************************************************************************
 	 * DEFINITION DES PROPRIETES
@@ -74,14 +69,14 @@ public class Constant implements Serializable {
 	public static final Map<String, String> LISTE_TYPE_DOCUMENT = new HashMap<>();
 	public static final Map<String, String> LISTE_TYPE_PUBLICATION = new HashMap<>();
 	public static final Map<String, List<String>> LISTE_FILTRE = new HashMap<>();
-	public static final List<DefaultTaggues> LISTE_DEFAULT_TAGGUES = new ArrayList();
+	public static final List<DefaultTaggues> LISTE_DEFAULT_TAGGUES = new ArrayList<>();
 	public static final List<ZoneCorrection> LISTE_ZONE_CORRECTION = new ArrayList<>();
 
-	public static final List<String> CODE_PAYS_FR = new ArrayList();
-	public static final Map<String, Integer> PROFILS = new HashMap();
-	public static final Map<String, String> COLONNES = new HashMap();
+	public static final List<String> CODE_PAYS_FR = new ArrayList<>();
+	public static final Map<String, Integer> PROFILS = new HashMap<>();
+	public static final Map<String, String> COLONNES = new HashMap<>();
 
-	public static final Map<String, CodePays> CODE_PAYS_SORTED = new TreeMap();
+	public static final Map<String, CodePays> CODE_PAYS_SORTED = new TreeMap<>();
 	public static final Map<String, String> LISTE_LIBELLEPAYS_CODEPAYS = new TreeMap<>(
 			String::compareTo);
 	public static final Map<String, CodePays> LISTE_CENTRE_ISSN = new TreeMap<>();
