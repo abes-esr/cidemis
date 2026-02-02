@@ -34,6 +34,10 @@ public class VerifierParamsTasklet implements Tasklet, StepExecutionListener {
             Calendar dateJour = Calendar.getInstance();
             this.annee = dateJour.get(Calendar.YEAR);
             this.mois = dateJour.get(Calendar.MONTH);
+            if (this.mois == 0) {
+                this.mois = 12;
+                this.annee--;
+            }
         }
     }
 
@@ -49,17 +53,21 @@ public class VerifierParamsTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        if ((mois <= 0) && (mois > 12)) {
+        if ((mois < 1) || (mois > 12)) {
             log.error(Constant.ERROR_MONTH_RANGE);
             stepContribution.setExitStatus(ExitStatus.FAILED);
+            return RepeatStatus.FINISHED;
         }
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String date = format.format(new Date());
 
-        if (annee < Integer.parseInt(date.substring(0,4))) {
-            log.error(Constant.ERROR_YEAR_RANGE);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy");
+        Integer anneeInDateJour = Integer.parseInt(format.format(Calendar.getInstance().getTime()));
+
+        if (this.annee > anneeInDateJour) {
+            log.error("L'année ne peut pas être supérieure à l'année en court");
             stepContribution.setExitStatus(ExitStatus.FAILED);
+            return RepeatStatus.FINISHED;
         }
+
         stepContribution.setExitStatus(ExitStatus.COMPLETED);
         return RepeatStatus.FINISHED;
     }

@@ -47,14 +47,14 @@ public class ExportStatistiquesTasklet implements Tasklet, StepExecutionListener
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        annee = (int) stepExecution.getJobExecution().getExecutionContext().get("annee");
-        mois = (int) stepExecution.getJobExecution().getExecutionContext().get("mois");
+        annee = (Integer) stepExecution.getJobExecution().getExecutionContext().get("annee");
+        mois = (Integer) stepExecution.getJobExecution().getExecutionContext().get("mois");
 
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        return null;
+        return stepExecution.getExitStatus();
     }
 
     @Override
@@ -110,10 +110,6 @@ public class ExportStatistiquesTasklet implements Tasklet, StepExecutionListener
         return RepeatStatus.FINISHED;
     }
 
-    private String getFileName(String fileName) {
-        return uploadPath + this.annee + ((this.mois < 10) ? '0' + this.mois.toString() : this.mois.toString()) + "_" + fileName;
-    }
-
     /**
      * Je ne fois pas enlever un mois, car ici je fais le mois et l'année passé -01, et donc j'aurai les stats de cette date + 1 mois
      * @return the current date
@@ -121,11 +117,10 @@ public class ExportStatistiquesTasklet implements Tasklet, StepExecutionListener
      */
     private Date getDate() throws ParseException {
         SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = formater.parse(this.annee + "-" + this.mois + "-01");
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.MONTH, 1); // Je rajoute un mois pour arriver au mois suivant (en effet, comme je fais 01, je suis au début du mois hors je dois passer à mes stats la date max de recherche
-        return c.getTime();
+        return formater.parse(this.annee + "-" + this.mois + "-01"); }
+
+    private String getFileName(String fileName) {
+        return uploadPath + this.annee + ((this.mois < 10) ? '0' + this.mois.toString() : this.mois.toString()) + "_" + fileName;
     }
 
 }
