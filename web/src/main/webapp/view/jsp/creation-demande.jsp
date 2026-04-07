@@ -397,7 +397,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CATALOGUEUR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CATALOGUEUR)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -424,7 +424,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande"
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -546,7 +546,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CATALOGUEUR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CATALOGUEUR)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -573,7 +573,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT) && (demande.cbsUsers.roles.idRole eq Constant.ROLE_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -675,7 +675,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VALIDEE_PAR_CORCAT) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_PRECISION_PAR_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>
@@ -701,7 +701,7 @@
                             </button>
                         </c:when>
                         <c:when
-                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VERS_INTERNATIONAL) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR)}">
+                                test="${(demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_VERS_INTERNATIONAL) || (demande.etatsDemandes.idEtatDemande eq Constant.ETAT_PRECISION_PAR_CORCAT)}">
                             <button action="enregistrer" class="formbutton actiondemande "
                                     title="Enregistrer" type="button" id="enregistrementBouton">
                                 <span>Enregistrer</span>

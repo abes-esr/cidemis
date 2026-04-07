@@ -23,7 +23,7 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
         switch (user.getRoles().getIdRole()){
             case Constant.ROLE_CATALOGUEUR:
             if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
-                    Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR,
+                    Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT,
                     Constant.ETAT_PRECISION_PAR_CATALOGUEUR
                     )) {
                 roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
@@ -32,8 +32,8 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
 
             case Constant.ROLE_CORCAT:
             if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
-                    Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR,
-                    Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR,
+                    Constant.ETAT_PRECISION_PAR_CORCAT,
+                    Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT,
                     Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
             )){
                 roles.add(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR));
@@ -50,7 +50,7 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
 
                 }
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
-                        Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR
+                        Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT
                 )){
                     roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
                 }

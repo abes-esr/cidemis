@@ -20,7 +20,7 @@
                 <li>${zone}</li>
         </c:forEach>
         </ul>
-        <span>Merci de faire une demande d'import ISSN sur le guichet <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+        <span>Merci de faire une demande d'import ISSN sur le <a target="_BLANK" href="https://assistance.stp.abes.fr/servicedesk/customer/portals" >guichet d'assistance</a></span>
         <br/><br/>
     </c:if>
     <c:if test="${fn:length(zones_presentes) gt 0}">
@@ -30,7 +30,7 @@
                 <li>${zone}</li>
         </c:forEach>
         </ul>
-        <span>Merci de faire une demande sur le guichet <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+        <span>Merci de faire une demande sur le <a target="_BLANK" href="https://assistance.stp.abes.fr/servicedesk/customer/portals" >guichet d'assistance</a></span>
         <br/><br/>
     </c:if>
     <button class="formbutton closepopup" title="Non" type="button"><span>OK</span></button>

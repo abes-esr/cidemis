@@ -28,7 +28,7 @@ public class EtabDemandesCorrection extends Export<EtabDemandesCorrectionDto> {
         String statusSimple;
 
         switch (idEtatDemande) {
-            case Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR:
+            case Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT:
                 statusSimple = "REJECT";
                 break;
             case Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE:

@@ -1,2 +1,2 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
-<span>Un ISSN a déjà été attribué pour le ppn ${ppn}. Si ce n'est pas le cas, merci de contacter l'Abes sur le guichet <a href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+<span>Un ISSN a déjà été attribué pour le ppn ${ppn}. Si ce n'est pas le cas, merci de contacter l'Abes sur le <a href="https://assistance.stp.abes.fr/servicedesk/customer/portals" >guichet d'assistance</a></span>

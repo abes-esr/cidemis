@@ -57,7 +57,7 @@ class ControleEnvoiMailServiceImplTest {
     void whichUserToSendEmailTestCatalogueur() {
         this.roles.setIdRole(Constant.ROLE_CATALOGUEUR);
         this.cbsUsers.setRoles(roles);
-        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR);
+        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT);
         demande.setEtatsDemandes(etatsDemandes);
         assertThat(controleEnvoiMailService.whichRoleOfUserToSendEmail(this.cbsUsers, this.demande).get(0).getIdRole()).isEqualTo(Constant.ROLE_CORCAT);
 
@@ -71,7 +71,7 @@ class ControleEnvoiMailServiceImplTest {
     void whichUserToSendEmailTestResponsableCR() {
         this.roles.setIdRole(Constant.ROLE_CORCAT);
         this.cbsUsers.setRoles(roles);
-        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR);
+        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_PRECISION_PAR_CORCAT);
         demande.setEtatsDemandes(etatsDemandes);
 
         assertThat(controleEnvoiMailService.whichRoleOfUserToSendEmail(this.cbsUsers, this.demande).get(0).getIdRole()).isEqualTo(Constant.ROLE_CATALOGUEUR);
@@ -80,7 +80,7 @@ class ControleEnvoiMailServiceImplTest {
         demande.setEtatsDemandes(etatsDemandes);
         assertThat(controleEnvoiMailService.whichRoleOfUserToSendEmail(this.cbsUsers, this.demande).get(0).getIdRole()).isEqualTo(Constant.ROLE_CATALOGUEUR);
 
-        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR);
+        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT);
         demande.setEtatsDemandes(etatsDemandes);
         assertThat(controleEnvoiMailService.whichRoleOfUserToSendEmail(this.cbsUsers, this.demande).get(0).getIdRole()).isEqualTo(Constant.ROLE_CATALOGUEUR);
 
@@ -101,7 +101,7 @@ class ControleEnvoiMailServiceImplTest {
     void whichUserToSendEmailTestISSNSendToCr() {
         this.roles.setIdRole(Constant.ROLE_ISSN);
         this.cbsUsers.setRoles(roles);
-        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR);
+        this.etatsDemandes.setIdEtatDemande(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT);
         demande.setEtatsDemandes(etatsDemandes);
 
         assertThat(controleEnvoiMailService.whichRoleOfUserToSendEmail(this.cbsUsers, this.demande).get(0).getIdRole()).isEqualTo(Constant.ROLE_CORCAT);

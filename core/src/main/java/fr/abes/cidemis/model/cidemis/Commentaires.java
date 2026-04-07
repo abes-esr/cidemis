@@ -52,7 +52,7 @@ public class Commentaires implements Serializable {
 			}
 			if (user.getRoles().getIdRole().compareTo(Constant.ROLE_CORCAT) == 0 && (
                     this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR
-					|| this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR
+					|| this.getDemande().getEtatsDemandes().getIdEtatDemande() == Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT
 					)) {
 				updatable = true;
 			}

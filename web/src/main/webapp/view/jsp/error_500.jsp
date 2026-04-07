@@ -15,7 +15,7 @@
             <span>
             	Merci de contacter nos techniciens via :
                 <br />
-                <a href="https://stp.abes.fr/node/3?origine=cidemis">ABESStp</a>
+                <a href="https://assistance.stp.abes.fr/servicedesk/customer/portals">ABESStp</a>
                 <br />
                 en précisant :
                 <br />
