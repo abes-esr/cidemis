@@ -185,7 +185,7 @@ public class UploadCiepsProcess {
                 this.addMessage(demande, "The provided ppn '" + ppn + "' does not match the request's ppn in our system.");
             }
         }
-        else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)  || demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE) || demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) {
+        else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT)  || demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE) || demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) {
             this.addMessage(demande, "You can't modify request number '" + demande.getIdDemande() + "'. This request is already closed.");
         }
         else {
@@ -215,7 +215,7 @@ public class UploadCiepsProcess {
         }
         else if (UploadCiepsProcess.INFORMATION_NEEDED.equals(status)) {
             if (!commentairetxt.isEmpty()){
-                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR));
+                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT));
             }
             else {
                 this.addMessage(demande, "Missing comment.");

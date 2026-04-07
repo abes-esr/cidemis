@@ -262,17 +262,17 @@ public class DemandesService implements IDemandesService {
                 return demande.getIln().equals(user.getIln())
                         && (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR)
                         || demande.isStateIn(new int[]{Constant.ETAT_PRECISION_PAR_CATALOGUEUR,
-                        Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR,
+                        Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT,
                         Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR}));
             case Constant.ROLE_ISSN:
                 return demande.isStateIn(
-                        new int[]{Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR, Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR})
+                        new int[]{Constant.ETAT_VALIDEE_PAR_CORCAT, Constant.ETAT_PRECISION_PAR_CORCAT})
                         && (user.getUserKey().equals(Constant.ADMIN_ISSN)
                         || user.getIdProfil().equals(demande.getIdProfil()
                 ));
             case Constant.ROLE_CIEPS:
-                return demande.isStateIn(new int[]{Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL,
-                        Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR, Constant.ETAT_VERS_INTERNATIONAL});
+                return demande.isStateIn(new int[]{Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL,
+                        Constant.ETAT_PRECISION_PAR_CORCAT, Constant.ETAT_VERS_INTERNATIONAL});
             default:
                 return false;
         }
@@ -285,7 +285,7 @@ public class DemandesService implements IDemandesService {
             case Constant.ROLE_CORCAT:
                 return ((demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE)) ||
                         (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE)) ||
-                        (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)));
+                        (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT)));
             default:
                 return false;
         }
@@ -627,15 +627,15 @@ public class DemandesService implements IDemandesService {
                 switch (demande.getEtatsDemandes().getIdEtatDemande()) {
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR:
                     case Constant.ETAT_VALIDEE_PAR_CATALOGUEUR:
-                    case Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR:
+                    case Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT:
                     case Constant.ETAT_PRECISION_PAR_CATALOGUEUR:
                         demande.setIdProfil(demande.getNotice().getIdprofil());
                         demande = setEtatISSN(demande, false);
                         this.setCentreISSN(demande, false);
                         break;
-                    case Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR:
-                    case Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL:
-                    case Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR:
+                    case Constant.ETAT_VALIDEE_PAR_CORCAT:
+                    case Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL:
+                    case Constant.ETAT_PRECISION_PAR_CORCAT:
                         this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
                         break;
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR:
@@ -661,14 +661,14 @@ public class DemandesService implements IDemandesService {
                     case Constant.ETAT_PRECISION_PAR_CATALOGUEUR:
                     case Constant.ETAT_VALIDEE_PAR_CATALOGUEUR:
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR:
-                    case Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR:
+                    case Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT:
                         this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR), demande);
                         break;
-                    case Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR:
-                    case Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL:
+                    case Constant.ETAT_PRECISION_PAR_CORCAT:
+                    case Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL:
                     case Constant.ETAT_VERS_INTERNATIONAL:
-                    case Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR), demande);
+                    case Constant.ETAT_VALIDEE_PAR_CORCAT:
+                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT), demande);
                         break;
                     default:
                         break;
@@ -686,7 +686,7 @@ public class DemandesService implements IDemandesService {
             } else if ("accepter".equals(this.demandeDto.getAction())) {
                 this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
             } else if ("rejeter".equals(this.demandeDto.getAction())) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR), demande);
+                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT), demande);
             }
         } else {
             log.error(
@@ -745,8 +745,8 @@ public class DemandesService implements IDemandesService {
 
         // Validée à destination de ... : ZONES 830$a et 301$a : On rempli la
         // zone quand la demande passe en "validée"
-        if (demande.isStateIn(new int[]{Constant.ETAT_VALIDEE_PAR_CATALOGUEUR, Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR,
-                Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL, Constant.ETAT_VERS_INTERNATIONAL}))
+        if (demande.isStateIn(new int[]{Constant.ETAT_VALIDEE_PAR_CATALOGUEUR, Constant.ETAT_VALIDEE_PAR_CORCAT,
+                Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL, Constant.ETAT_VERS_INTERNATIONAL}))
             this.updateCBSValidated(noticehelper, idCidemis, demande, user);
             // Accepté : NUMERO ISSN et CENTRE ISSN
         else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE))
@@ -755,7 +755,7 @@ public class DemandesService implements IDemandesService {
         else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE))
             this.updateCBSRefusedByISSNOrCIEPS(noticehelper, idCidemis, demande);
             // Rejetée
-        else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR))
+        else if (demande.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT))
             this.updateCBSRejected(noticehelper, idCidemis, demande);
     }
 
@@ -1031,11 +1031,11 @@ public class DemandesService implements IDemandesService {
      */
     private Demandes setEtatISSN(Demandes demande, boolean fromIssn) {
         if (Constant.getCodePaysFr().contains(demande.getNotice().getPays()))
-            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR));
+            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT));
         else if (fromIssn)
             demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VERS_INTERNATIONAL));
         else
-            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL));
+            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL));
         return demande;
     }
 

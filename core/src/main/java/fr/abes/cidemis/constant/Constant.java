@@ -40,16 +40,16 @@ public class Constant implements Serializable {
 	public static final int ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR = 22;
 	public static final int ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR = 23;
 	public static final int ETAT_VALIDEE_PAR_CATALOGUEUR = 24;
-	public static final int ETAT_VALIDEE_PAR_RESPONSABLE_CR = 25;
-	public static final int ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL = 26;
+	public static final int ETAT_VALIDEE_PAR_CORCAT = 25;
+	public static final int ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL = 26;
 	public static final int ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR = 27;
-	public static final int ETAT_EN_ATTENTE_PRECISION_RESPONSABLE_CR = 28;
+	public static final int ETAT_EN_ATTENTE_PRECISION_CORCAT = 28;
 	public static final int ETAT_VERS_INTERNATIONAL = 33;
 	public static final int ETAT_PRECISION_PAR_CATALOGUEUR = 34;
-	public static final int ETAT_PRECISION_PAR_RESPONSABLE_CR = 35;
+	public static final int ETAT_PRECISION_PAR_CORCAT = 35;
 	public static final int ETAT_TRAITEMENT_TERMINE_REFUSEE = 36;
 	public static final int ETAT_TRAITEMENT_TERMINE_ACCEPTEE = 37;
-	public static final int ETAT_TRAITEMENT_REJETEE_PAR_CR = 38;
+	public static final int ETAT_TRAITEMENT_REJETEE_PAR_CORCAT = 38;
 	public static final int ETAT_ARCHIVEE = 39;
 
 	public static final int ROLE_CATALOGUEUR = 1;

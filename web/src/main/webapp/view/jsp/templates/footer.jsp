@@ -12,7 +12,7 @@
      |
     <a target="_blank" href="https://abes.fr/pages-accessibilite/cidemis.html" title="Accessibilité">Accessibilité numérique</a>
      |
-    <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=cidemis" title="Guichet d'assistance CIDEMIS">Assistance</a>
+    <a target="_BLANK" href="https://assistance.stp.abes.fr/servicedesk/customer/portals" title="Guichet d'assistance">Assistance</a>
      | 
     <a target="_BLANK" href="http://www.bnf.fr/fr/professionnels/s_informer_obtenir_issn.html" title="Site internet de la Bibliothèque nationale de France"><img alt="BNF" src="<c:url value="/resources/img/bnfLogo.svg"/>" /></a>
      | 

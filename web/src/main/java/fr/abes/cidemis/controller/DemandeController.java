@@ -123,7 +123,7 @@ public class DemandeController extends AbstractServlet {
         for (Demandes d : demandes) {
             if (d.getTypesDemandes().getIdTypeDemande().equals(typeDemande) &&
                     !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE) &&
-                    !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CR)) {
+                    !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT)) {
                 demandesPPN.add(d);
             }
         }

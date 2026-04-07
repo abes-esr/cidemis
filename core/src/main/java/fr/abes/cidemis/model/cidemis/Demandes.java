@@ -146,8 +146,8 @@ public class Demandes implements Serializable {
      */
     public boolean sendMailToCieps(CbsUsers user) {
         if (this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VERS_INTERNATIONAL)
-                || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VALIDEE_PAR_RESPONSABLE_CR_VERS_INTERNATIONAL)
-                || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_PRECISION_PAR_RESPONSABLE_CR))
+                || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL)
+                || this.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_PRECISION_PAR_CORCAT))
             return !Constant.getCodePaysFr().contains(this.getNotice().getPays())
                     && (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)
                     || user.getRoles().getIdRole().equals(Constant.ROLE_ISSN));

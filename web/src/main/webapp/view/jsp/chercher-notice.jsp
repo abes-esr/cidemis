@@ -27,7 +27,7 @@
                     <li>${zone}</li>
                 </c:forEach>
                 </ul>
-                <span>Merci de faire une demande d'import ISSN sur le guichet <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+                <span>Merci de faire une demande d'import ISSN sur le guichet <a target="_BLANK" href="https://assistance.stp.abes.fr/servicedesk/customer/portals" >AbesStp</a></span>
                 <button class="formbutton closepopup" title="Non" type="button"><span>OK</span></button>
             </c:when>
             <c:when test="${type_demande == Constant.TYPE_DEMANDE_NUMEROTATION && (fn:length(zones_manquantes) gt 0 || fn:length(zones_presentes) gt 0)}">
@@ -41,7 +41,7 @@
                         <li>${zone}</li>
                     </c:forEach>
                     </ul>
-                    <span>Merci de faire une demande d'import ISSN sur le guichet <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+                    <span>Merci de faire une demande d'import ISSN sur le <a target="_BLANK" href="" >guichet d'assistance</a></span>
                 </c:if>
                 <c:if test="${fn:length(zones_presentes) gt 0}">
                     <span>Les zones suivantes ne doivent pas être présentes dans la notice</span>
@@ -50,7 +50,7 @@
                         <li>${zone}</li>
                     </c:forEach>
                     </ul>
-                    <span>Merci de faire une demande sur le guichet <a target="_BLANK" href="https://stp.abes.fr/node/3?origine=sudocpro" >AbesStp</a></span>
+                    <span>Merci de faire une demande sur le <a target="_BLANK" href="https://assistance.stp.abes.fr/servicedesk/customer/portals" >guichet d'assistance</a></span>
                 </c:if>
                 <button class="formbutton closepopup" title="Non" type="button"><span>OK</span></button>
             </c:when>

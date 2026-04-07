@@ -14,7 +14,7 @@
                 <span>Déconnecter</span>
             </button>
             <span id="bienvenue">Bienvenue ${connexion.user.shortName}</span> <span class="role">${connexion.user.roles.libRole}</span>
-            <span class="email">${connexion.user.userEmail} - <a href="https://stp.abes.fr/node/3?origine=cidemis" style='color: white' target="_blank">Assistance</a></span>
+            <span class="email">${connexion.user.userEmail} - <a href="https://assistance.stp.abes.fr/servicedesk/customer/portals" style='color: white' target="_blank">Assistance</a></span>
             <div class="right">
                 <div id="modifemail">
                     <input validateOnEnter="modifemail" type="text" mail="${connexion.user.userEmail}" value="${connexion.user.userEmail}" />

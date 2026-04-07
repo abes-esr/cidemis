@@ -19,7 +19,7 @@
     <!-- Barre de navigation -->
     <nav class="navbar" style="background-color: #166dae">
         <div><a href='/logout'><img src="<c:url value="/resources/img/cidemis-vectoriel-blanc.png" />" alt="logo de cidemis" width="180" height="45" style="margin-left: 1em"></a></div>
-        <div style='position: absolute;right: 150px;top: 10px;width: 200px;'><a href="https://stp.abes.fr/node/3?origine=cidemis" title='Assistance'><img src="<c:url value="/resources/img/item_assistance.svg" />" alt="guichet d'assistance d'assitance" width="40"></a> <span style='color: white'>Assistance</span></div>
+        <div style='position: absolute;right: 150px;top: 10px;width: 200px;'><a href="https://assistance.stp.abes.fr/servicedesk/customer/portals" title='Assistance'><img src="<c:url value="/resources/img/item_assistance.svg" />" alt="guichet d'assistance d'assitance" width="40"></a> <span style='color: white'>Assistance</span></div>
         <div style='position: absolute;right: 0px;top: 10px;width: 200px;'><a href="https://documentation.abes.fr/aidecidemis/index.html" title='Documentation'><img src="<c:url value="/resources/img/item_documentation.svg" />" alt="documentation" width="40"></a> <span style='color: white'>Documentation</span></div>
     </nav>
 
