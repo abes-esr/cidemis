@@ -1,6 +1,6 @@
 ###
 # Image pour la compilation
-FROM maven:3-eclipse-temurin-11 as build-image
+FROM maven:3-eclipse-temurin-21 as build-image
 WORKDIR /build/
 # Installation et configuration de la locale FR
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt -y install locales
@@ -29,7 +29,7 @@ RUN mvn --batch-mode \
         -Duser.language=fr \
         package
 
-FROM tomcat:9.0.59-jdk11-temurin as web-image
+FROM dhi.io/tomcat:9-jdk21 as web-image
 COPY --from=build-image /build/web/target/web.war /usr/local/tomcat/webapps/ROOT.war
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -50,7 +50,7 @@ RUN dnf install -y cronie gettext && \
     crond -V && rm -rf /etc/cron.*/*
 COPY ./docker/batch/tasks.tmpl /etc/cron.d/tasks.tmpl
 # Le JAR et le script pour le batch de LN
-RUN dnf install -y java-11-openjdk
+RUN dnf install -y java-21-openjdk
 COPY ./docker/batch/cidemisBatchMailCIEPS.sh /scripts/cidemisBatchMailCIEPS.sh
 RUN chmod +x /scripts/cidemisBatchMailCIEPS.sh
 COPY ./docker/batch/cidemisBatchExportStatistiques.sh /scripts/cidemisBatchExportStatistiques.sh
