@@ -1,12 +1,10 @@
 #!/bin/bash
 
-
-
 # Paramètres par défaut du conteneur
 export CIDEMIS_BATCH_CRON_STATS=${CIDEMIS_BATCH_CRON_STATS:='50 8 1 * *'}
 export CIDEMIS_BATCH_CRON_MAILING=${CIDEMIS_BATCH_CRON_MAILING:='50 8 1 * *'}
 export CIDEMIS_BATCH_LAUNCH=${CIDEMIS_BATCH_LAUNCH:='0'}
-export CIDEMIS_BATCH_CERT=${CIDEMIS_BATCH_CERT:="/cert/"}
+export CIDEMIS_BATCH_CERT=${CIDEMIS_BATCH_CERT:="/cert"}
 
 if [ -f "$CIDEMIS_BATCH_CERT/certif.sh" ]; then
   bash "$CIDEMIS_BATCH_CERT/certif.sh"

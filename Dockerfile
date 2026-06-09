@@ -30,6 +30,7 @@ RUN mvn --batch-mode \
         package
 
 FROM dhi.io/tomcat:10-jdk21 AS web-image
+USER root
 COPY --from=build-image /build/web/target/web.war /usr/local/tomcat/webapps/ROOT.war
 ENV TZ=Europe/Paris
 ENV CATALINA_OPTS="-Duser.timezone=Europe/Paris"
