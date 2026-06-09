@@ -29,7 +29,7 @@ RUN mvn --batch-mode \
         -Duser.language=fr \
         package
 
-FROM tomcat:10-jdk21 AS web-image
+FROM tomcat:10-jdk21-temurin AS web-image
 COPY --from=build-image /build/web/target/web.war /usr/local/tomcat/webapps/ROOT.war
 ENV TZ=Europe/Paris
 ENV CATALINA_OPTS="-Duser.timezone=Europe/Paris"

@@ -1,10 +1,12 @@
 package fr.abes.cidemis.service;
 
 import lombok.Getter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
 
+@Lazy
 @Getter
 @Service
 public class CidemisManageService {
