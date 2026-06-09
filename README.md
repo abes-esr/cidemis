@@ -2,12 +2,12 @@
 Circuit Dématérialisé des Demandes ISSN
 
 Configuration locale minimale :
-- mettre une JDK11 (ctrl alt shift s sur intellij, projet structure)
+- mettre une JDK21 (ctrl alt shift s sur intellij, projet structure)
 - créer un fichier application-localhost.properties placer dans le répertoire ressources du module web
 - renseigner les couples clé / valeur ci dessous
 
 Note: ces valeurs sont susceptibles d'évoluer (observer les logs d'erreur de lancement de l'appli pour des valeurs ou clés manquantes)
-```txt
+```properties
 cidemis.datasource.url=
 cidemis.datasource.username=
 cidemis.datasource.password=

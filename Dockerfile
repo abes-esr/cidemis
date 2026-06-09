@@ -29,7 +29,7 @@ RUN mvn --batch-mode \
         -Duser.language=fr \
         package
 
-FROM dhi.io/tomcat:9-jdk21 as web-image
+FROM dhi.io/tomcat:10-jdk21 as web-image
 COPY --from=build-image /build/web/target/web.war /usr/local/tomcat/webapps/ROOT.war
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

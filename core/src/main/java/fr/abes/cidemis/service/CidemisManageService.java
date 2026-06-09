@@ -3,7 +3,7 @@ package fr.abes.cidemis.service;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 @Getter
 @Service
