@@ -14,7 +14,6 @@ cidemis.datasource.password=
 cidemis.datasource.driver-class-name=oracle.jdbc.OracleDriver
 spring.jpa.hibernate.ddl-auto=none
 spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.Oracle12cDialect
 spring.batch.jdbc.initialize-schema=never
 logging.config=classpath:log4j2-spring.xml
 psi.lien.perenne=
@@ -34,7 +33,6 @@ cidemis.url=
 logging.level.fr.abes=
 logging.level.root=
 spring.jpa.open-in-view=
-spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
 path.justificatifs=
 wsAuthSudoc.url=
 ```
