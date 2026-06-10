@@ -1,14 +1,14 @@
 ###
 # Image pour la compilation
-FROM maven:3-eclipse-temurin-11 as build-image
+FROM maven:3-eclipse-temurin-21 AS build-image
 WORKDIR /build/
 # Installation et configuration de la locale FR
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt -y install locales
 RUN sed -i '/fr_FR.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
-ENV LANG fr_FR.UTF-8
-ENV LANGUAGE fr_FR:fr
-ENV LC_ALL fr_FR.UTF-8
+ENV LANG=fr_FR.UTF-8
+ENV LANGUAGE=fr_FR:fr
+ENV LC_ALL=fr_FR.UTF-8
 
 
 # On lance la compilation Java
@@ -29,10 +29,10 @@ RUN mvn --batch-mode \
         -Duser.language=fr \
         package
 
-FROM tomcat:9.0.59-jdk11-temurin as web-image
+FROM tomcat:10-jdk21-temurin AS web-image
 COPY --from=build-image /build/web/target/web.war /usr/local/tomcat/webapps/ROOT.war
 ENV TZ=Europe/Paris
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV CATALINA_OPTS="-Duser.timezone=Europe/Paris"
 CMD ["catalina.sh", "run"]
 
 
@@ -40,7 +40,7 @@ CMD ["catalina.sh", "run"]
 # Image pour le module batch
 # Remarque: l'image openjdk:11 n'est pas utilisée car nous avons besoin de cronie
 #           qui n'est que disponible sous centos/rockylinux.
-FROM rockylinux:8 as batch-image
+FROM rockylinux:8 AS batch-image
 WORKDIR /scripts/
 # systeme pour les crontab
 # cronie: remplacant de crond qui support le CTRL+C dans docker (sans ce système c'est compliqué de stopper le conteneur)
@@ -50,7 +50,7 @@ RUN dnf install -y cronie gettext && \
     crond -V && rm -rf /etc/cron.*/*
 COPY ./docker/batch/tasks.tmpl /etc/cron.d/tasks.tmpl
 # Le JAR et le script pour le batch de LN
-RUN dnf install -y java-11-openjdk
+RUN dnf install -y java-21-openjdk
 COPY ./docker/batch/cidemisBatchMailCIEPS.sh /scripts/cidemisBatchMailCIEPS.sh
 RUN chmod +x /scripts/cidemisBatchMailCIEPS.sh
 COPY ./docker/batch/cidemisBatchExportStatistiques.sh /scripts/cidemisBatchExportStatistiques.sh

@@ -9,11 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -44,7 +44,7 @@ public class Login extends AbstractServlet {
         RegistryUser user = param.readUserWsProfile(url, userKey, password);
         if (user != null) {
             HttpSession newSession = request.getSession(true);
-            String forwardedUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+            String forwardedUri = (String) request.getAttribute("jakarta.servlet.forward.request_uri");
 
             if (forwardedUri != null && forwardedUri.contains("afficher-demande")) {
                 newSession.setAttribute("forwarded_uri", "afficher-demande");
