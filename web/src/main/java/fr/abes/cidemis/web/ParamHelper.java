@@ -8,16 +8,16 @@ import fr.abes.cidemis.exception.DaoException;
 import fr.abes.cidemis.model.cidemis.Connexion;
 import fr.abes.cidemis.model.cidemis.RegistryUser;
 import fr.abes.cidemis.service.CidemisManageService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -75,6 +75,7 @@ public class ParamHelper {
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 //Gestion de l'erreur
                 log.error("Login et / ou mot de passe erroné");
+                log.error("Code erreur : " + conn.getResponseCode());
                 return null;
             }
             InputStream reponse = conn.getInputStream();

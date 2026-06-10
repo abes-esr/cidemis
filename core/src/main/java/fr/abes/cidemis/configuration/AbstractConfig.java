@@ -11,8 +11,6 @@ import java.util.HashMap;
 public abstract class AbstractConfig {
     @Value("${spring.jpa.show-sql}")
     protected String showsql;
-    @Value("${spring.jpa.properties.hibernate.dialect}")
-    protected String dialect;
     @Value("${spring.jpa.hibernate.ddl-auto}")
     protected String ddlAuto;
 
@@ -23,7 +21,6 @@ public abstract class AbstractConfig {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.show_sql", showsql);
         properties.put("hibernate.format_sql", true);
-        properties.put("hibernate.dialect", dialect);
         em.setJpaPropertyMap(properties);
     }
 
