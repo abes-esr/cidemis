@@ -4,10 +4,10 @@ import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.model.cidemis.Commentaires;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
+import jakarta.annotation.PostConstruct;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class DemandeMapper extends ModelMapper {
                 .collect(Collectors.toList());
     }
 
-    @Bean
+    @PostConstruct
     public void converterDemandes() {
         Converter<Demandes, DemandesDto> myConverter = new Converter<Demandes, DemandesDto>() {
 
