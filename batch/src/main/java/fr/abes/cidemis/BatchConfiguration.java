@@ -1,5 +1,7 @@
 package fr.abes.cidemis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.abes.cidemis.ajoutRefus.MajSudocTasklet;
 import fr.abes.cidemis.ajoutRefus.SelectDemandesRefusTasklet;
 import fr.abes.cidemis.constant.Constant;
@@ -12,51 +14,53 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
-import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.*;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
-@EnableBatchProcessing(
-        dataSourceRef = "cidemisDataSource",
-        transactionManagerRef = "cidemisTransactionManager",
-        executionContextSerializerRef = "batchExecutionContextSerializer"
-)
-public class BatchConfiguration extends DefaultBatchConfiguration {
-    @Autowired
-    @Qualifier("cidemisJdbcTemplate")
-    protected JdbcTemplate jdbcTemplate;
+@ComponentScans(value = {
+        @ComponentScan(basePackages = "fr.abes.cidemis.configuration"),
+        @ComponentScan(basePackages = "fr.abes.cidemis.service"),
+        @ComponentScan(basePackages = "fr.abes.cidemis.dao.cidemis"),
+        @ComponentScan(basePackages = "fr.abes.cidemis.components"),
+})
+@EntityScan(basePackages = "fr.abes.cidemis.model.cidemis")
+public class BatchConfiguration {
+    private final JdbcTemplate jdbcTemplate;
+
+    public BatchConfiguration(@Qualifier("cidemisJdbcTemplate") JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Bean
-    public Jackson2ExecutionContextStringSerializer batchExecutionContextSerializer() {
+    @Primary
+    public ObjectMapper objectMapper() {
+        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        ObjectMapper objectMapper = builder.build();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
+    }
+
+    @Bean
+    public ExecutionContextSerializer batchExecutionContextSerializer() {
         return new Jackson2ExecutionContextStringSerializer(DemandesDto.class.getName());
-    }
-
-    @Override
-    protected int getMaxVarCharLength() {
-        return 1000;
-    }
-
-    @Override
-    protected boolean getValidateTransactionState() {
-        return false;
     }
 
     // Job d'export des statistiques mensuelles
     @Bean
-    public Job jobExportStatistiques(JobRepository jobRepository, Step stepVerifierParams, Step stepExportStatistiques) {
+    public Job jobExportStatistiques(JobRepository jobRepository, @Qualifier("stepVerifierParams") Step stepVerifierParams, @Qualifier("stepExportStatistiques") Step stepExportStatistiques) {
         return new JobBuilder(Constant.SPRING_BATCH_JOB_EXPORT_STATISTIQUES_NAME, jobRepository)
                 .incrementer(incrementer())
                 .start(stepVerifierParams).on(Constant.FAILED).end()
@@ -66,7 +70,7 @@ public class BatchConfiguration extends DefaultBatchConfiguration {
     }
 
     @Bean
-    public Job jobMailing(JobRepository jobRepository, Step stepSelectDemandes, Step stepEnvoiMail) {
+    public Job jobMailing(JobRepository jobRepository, @Qualifier("stepSelectDemandes") Step stepSelectDemandes, @Qualifier("stepEnvoiMail") Step stepEnvoiMail) {
         return new JobBuilder(Constant.SPRING_BATCH_JOB_MAILING, jobRepository)
                 .incrementer(incrementer())
                 .start(stepSelectDemandes).on(Constant.NODEMANDE).end()
@@ -76,7 +80,7 @@ public class BatchConfiguration extends DefaultBatchConfiguration {
     }
 
     @Bean
-    public Job jobRefus(JobRepository jobRepository, Step stepSelectDemandesRefus, Step stepMajSudoc) {
+    public Job jobRefus(JobRepository jobRepository, @Qualifier("stepSelectDemandes") Step stepSelectDemandesRefus, @Qualifier("stepMajSudoc") Step stepMajSudoc) {
         return new JobBuilder(Constant.SPRING_BATCH_JOB_REFUS, jobRepository)
                 .incrementer(incrementer())
                 .start(stepSelectDemandesRefus).on(Constant.NODEMANDE).end()
