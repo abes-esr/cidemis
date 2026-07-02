@@ -16,7 +16,7 @@ public class JdbcTemplateDaoImpl implements IJdbcTemplateDao {
     private DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
 
-    public JdbcTemplateDaoImpl(@Qualifier("cidemisDataSource") DataSource cidemisDataSource, @Qualifier("cidemisJdbcTemplate") JdbcTemplate jdbcTemplate) {
+    public JdbcTemplateDaoImpl(DataSource cidemisDataSource, @Qualifier("cidemisJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.dataSource = cidemisDataSource;
         this.jdbcTemplate = jdbcTemplate;
     }
