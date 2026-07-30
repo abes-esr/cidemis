@@ -1,0 +1,16 @@
+-- NOTE (30/07/2026) : les index sur DATE_ETAT existent DEJA en production :
+--   INDEX_DATE_ETAT_BIBIO   (DATE_ETAT, ID)  - VALID, VISIBLE
+--   INDEX_DATE_ETAT_I_BIBIO (DATE_ETAT)      - VALID, VISIBLE
+-- => NE PAS creer d'index supplementaire.
+--
+-- Mesures reelles en prod (table de 21,6 M lignes) :
+--   select max(DATE_ETAT) ... where DATE_ETAT < sysdate          -> 0,04 s (INDEX MIN/MAX)
+--   select PPN, DATE_ETAT ... order by DATE_ETAT desc fetch 1    -> > 60 s (timeout)
+-- Le probleme etait uniquement la forme de la requete generee par Spring Data
+-- (findFirstBy...OrderBy...Desc) : Oracle ne descend pas l'index pour le top-N
+-- a cause du tres mauvais clustering factor (~18 M). La correction applicative
+-- (IToolsDao : @Query select max(...)) suffit.
+--
+-- Requete de verification des index :
+--   SELECT index_name, column_name FROM all_ind_columns
+--   WHERE table_owner = 'AUTORITES' AND table_name = 'NOTICESBIBIO';

@@ -8,19 +8,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 @Service
 @Slf4j
 public class ToolsService implements IToolsService {
+    /** Durée de validité du cache en millisecondes (la table NOTICESBIBIO est très volumineuse). */
+    private static final long CACHE_TTL_MS = 60_000L;
+
     @Autowired
     private CidemisDaoProvider dao;
 
+    private volatile String lastDateSynchronizedCache;
+    private volatile long lastDateSynchronizedCacheTime;
+
     @Override
     public String getLastDateSynchronized() {
+        long now = System.currentTimeMillis();
+        String cached = this.lastDateSynchronizedCache;
+        if (cached != null && (now - this.lastDateSynchronizedCacheTime) < CACHE_TTL_MS) {
+            return cached;
+        }
         String pattern = "dd/MM/yyyy HH:mm:ss";
         SimpleDateFormat format = new SimpleDateFormat(pattern);
-        return format.format(this.dao.getToolsDao().findFirstByDateEtatBeforeOrderByDateEtatDesc(new GregorianCalendar()).getDateEtat().getTime());
+        Calendar maxDateEtat = this.dao.getToolsDao().findMaxDateEtatBefore(new GregorianCalendar());
+        String result = format.format(maxDateEtat.getTime());
+        this.lastDateSynchronizedCache = result;
+        this.lastDateSynchronizedCacheTime = now;
+        return result;
     }
 
     @Override
