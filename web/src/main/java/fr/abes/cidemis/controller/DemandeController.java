@@ -12,6 +12,9 @@ import fr.abes.cidemis.model.cidemis.*;
 import fr.abes.cidemis.model.dto.DemandeDto;
 import fr.abes.cidemis.service.CidemisManageService;
 import fr.abes.cidemis.web.MyDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestClientException;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -123,7 +123,8 @@ public class DemandeController extends AbstractServlet {
         for (Demandes d : demandes) {
             if (d.getTypesDemandes().getIdTypeDemande().equals(typeDemande) &&
                     !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE) &&
-                    !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT)) {
+                    !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT) &&
+                    !d.getEtatsDemandes().getIdEtatDemande().equals(Constant.ETAT_ARCHIVEE)) {
                 demandesPPN.add(d);
             }
         }

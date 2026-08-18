@@ -30,7 +30,7 @@ public class DemandesListe implements Serializable {
      * @param demande
      */
     public void setDemandeslist(List<Demandes> demandeslist, Demandes demande) {
-    	ArrayList<Demandes> demandeslistWithoutPPN = new ArrayList();
+    	ArrayList<Demandes> demandeslistWithoutPPN = new ArrayList<>();
     	
     	for (Demandes dem : demandeslist)
     		if (demande == null || dem.getIdDemande().intValue() != demande.getIdDemande().intValue())
