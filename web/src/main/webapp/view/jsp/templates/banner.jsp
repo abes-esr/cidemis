@@ -210,7 +210,7 @@
         
         <!-- Lien de l'assistance -->
         <li>
-            <a target="_BLANK" href="https://documentation.abes.fr/aidecidemis/accueil/index.html">
+            <a target="_BLANK" href="https://documentation.abes.fr/aidecidemis/index.html#$0">
                 <i class="icon-assistance"></i> <span class="title">Aide en ligne</span>
             </a>
         </li>
