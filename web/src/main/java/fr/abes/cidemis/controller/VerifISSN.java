@@ -1,22 +1,33 @@
 package fr.abes.cidemis.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.web.ParamHelper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.PrintWriter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 public class VerifISSN extends AbstractServlet {
+    private final ParamHelper param;
+    private final IDemandesService demandes;
+
+    public VerifISSN(ParamHelper param, IDemandesService demandes) {
+        this.param = param;
+        this.demandes = demandes;
+    }
+
     @Override
     protected boolean checkSession() { return true; }
 
@@ -32,7 +43,7 @@ public class VerifISSN extends AbstractServlet {
         String ppn = param.getParameter("ppn");
         
     	try {
-			json.put("exist", !getService().getDemande().findDemandesByISSN(issn, ppn).isEmpty());
+			json.put("exist", !this.demandes.findDemandesByISSN(issn, ppn).isEmpty());
 		}
     	catch (JSONException e) {
 			log.error( "VerifISSN Error", e);
@@ -41,10 +52,5 @@ public class VerifISSN extends AbstractServlet {
         
         out.print(json);
         out.flush();
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Check if ISSN is already use";
     }
 }

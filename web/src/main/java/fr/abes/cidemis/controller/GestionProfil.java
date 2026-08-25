@@ -1,21 +1,29 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.model.cidemis.CbsUsers;
-import fr.abes.cidemis.model.cidemis.Connexion;
-import fr.abes.cidemis.model.cidemis.Roles;
-import fr.abes.cidemis.web.MyDispatcher;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.model.cidemis.CbsUsers;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.model.cidemis.Roles;
+import fr.abes.cidemis.service.IUsersService;
+import fr.abes.cidemis.web.MyDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.Iterator;
-import java.util.List;
 @Controller
 public class GestionProfil extends AbstractServlet {
+    private final IUsersService users;
+
+    public GestionProfil(IUsersService users) {
+        this.users = users;
+    }
+
     @Override
     protected boolean checkSession() { return true; }
 
@@ -30,29 +38,23 @@ public class GestionProfil extends AbstractServlet {
         // On vérifie que l'on est bien connecté avec le login de l'admin issn
         if (connexion.getUser().getUserKey().equals(Constant.ADMIN_ISSN)){
             // On récupère la liste des users de l'issn
-            Roles roleIssn = getService().getUsers().findRoles(Constant.ROLE_ISSN);
-            List<CbsUsers> users = getService().getUsers().findCbsUsersByRoles(roleIssn);
+            Roles roleIssn = this.users.findRoles(Constant.ROLE_ISSN);
+            List<CbsUsers> usersList = this.users.findCbsUsersByRoles(roleIssn);
             CbsUsers u;
             
             // On retire l'admin de la liste
-            Iterator<CbsUsers> it = users.iterator();
+            Iterator<CbsUsers> it = usersList.iterator();
             while(it.hasNext()){
                 u =  it.next();
                 if (u.getUserKey().equals(Constant.ADMIN_ISSN))
                     it.remove();
             }
             
-            request.setAttribute("users", users);
+            request.setAttribute("users", usersList);
             return MyDispatcher.GESTIONPROFILJSP;
         }
         else {   
             return MyDispatcher.LISTE_DEMANDES;
         }
     }
-
-    @Override
-    public String getServletInfo() {
-        return "JSP permettant la gestion des roles ISSN";
-    }
-
 }

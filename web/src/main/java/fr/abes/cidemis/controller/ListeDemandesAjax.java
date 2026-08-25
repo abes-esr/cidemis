@@ -1,5 +1,18 @@
 package fr.abes.cidemis.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.exception.DaoException;
 import fr.abes.cidemis.localisation.LocalProvider;
@@ -7,31 +20,26 @@ import fr.abes.cidemis.model.cidemis.Connexion;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.Options;
 import fr.abes.cidemis.model.cidemis.Taggues;
-import fr.abes.cidemis.service.impl.DemandesService;
-import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.service.IOptionsService;
+import fr.abes.cidemis.web.ParamHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 public class ListeDemandesAjax extends AbstractServlet {
-	private final DemandesService service;
+    private final ParamHelper param;
+    private final IDemandesService demandesService;
+    private final IOptionsService options;
 
-	public ListeDemandesAjax(DemandesService service) {
-		this.service = service;
-	}
+    public ListeDemandesAjax(ParamHelper param, IOptionsService options, IDemandesService demandes) {
+        this.param = param;
+        this.demandesService = demandes;
+        this.options = options;
+    }
 
 	@Override
 	protected boolean checkSession() { return true; }
@@ -58,8 +66,8 @@ public class ListeDemandesAjax extends AbstractServlet {
 		/**
 		 * On récupère les demandes de l'utilisateur
 		 */
-		List<Demandes> demandes = getService().getDemande().findDemandesByCbsUsers(connexion.getUser(), demandesDoneChecked, demandesArchivedChecked);
-		if (profilId != Constant.PROFIL_PAS_PROFIL && profilId != Constant.PROFIL_TOUTES_DEMANDES) {
+		List<Demandes> demandes = this.demandesService.findDemandesByCbsUsers(connexion.getUser(), demandesDoneChecked, demandesArchivedChecked);
+		if (!Objects.equals(profilId, Constant.PROFIL_PAS_PROFIL) && !Objects.equals(profilId, Constant.PROFIL_TOUTES_DEMANDES)) {
 			Iterator<Demandes> it = demandes.iterator();
 
 			while (it.hasNext()) {
@@ -70,20 +78,19 @@ public class ListeDemandesAjax extends AbstractServlet {
 		}
 
 		if (demandes == null)
-			demandes = new ArrayList();
+			demandes = new ArrayList<>();
 
 		/**
 		 * Liste pour le menu "Afficher/Masquer des colonne"
 		 */
 		List<Options> optionsColonnesListe = null;
 		try {
-			optionsColonnesListe = getService().getOptions().findOptionsColonnesByCbsUsers(connexion.getUser());
+			optionsColonnesListe = this.options.findOptionsColonnesByCbsUsers(connexion.getUser());
 		} catch (DaoException e) {
-			e.printStackTrace();
 			log.error("ERREUR: " + e.getTierOfException() + " : " + e.getTypeOfException() + " : TABLE " + e.getTableOfException());
 		}
 
-		List<Options> optionsColonnesListeOrdered = new ArrayList();
+		List<Options> optionsColonnesListeOrdered = new ArrayList<>();
 		LocalProvider lang = new LocalProvider(request.getLocale());
 
 		for (Options o : optionsColonnesListe) {
@@ -110,7 +117,7 @@ public class ListeDemandesAjax extends AbstractServlet {
 		for (Demandes de : demandes) {
 			demandeJson = new JSONObject();
 			for (Options option : optionsColonnesListe) {
-				value = getService().getDemande().getDemandemap(de).get(option.getLibOption());
+				value = this.demandesService.getDemandemap(de).get(option.getLibOption());
 				demandeJson.put(option.getLibOption(), (value == null) ? "" : value);
 			}
 
@@ -133,8 +140,8 @@ public class ListeDemandesAjax extends AbstractServlet {
 			action = new JSONObject();
 			action.put("id_demande", de.getIdDemande());
 			action.put("pieces_justificatives_nb", de.getNbPiecesJustificatives());
-			action.put("can_delete", service.canUserDeleteDemande(connexion.getUser(), de));
-			action.put("can_archive", service.canUserArchiveDemande(connexion.getUser(), de));
+			action.put("can_delete", this.demandesService.canUserDeleteDemande(connexion.getUser(), de));
+			action.put("can_archive", this.demandesService.canUserArchiveDemande(connexion.getUser(), de));
 
 			if (connexion.getUser().isISSNOrCIEPS())
 				action.put("commentaires_nb", de.getNbCommentairesISSN());
@@ -149,10 +156,4 @@ public class ListeDemandesAjax extends AbstractServlet {
 		demandesJson.put("data", demandesDataJson);
 		demandesJson.write(response.getWriter());
 	}
-
-	@Override
-	public String getServletInfo() {
-		return "Retourne les demandes pour l'utilisateur";
-	}
-
 }

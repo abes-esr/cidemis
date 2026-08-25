@@ -43,12 +43,12 @@ Penser à créer sur son disque c, à la racine, un dossier applis, et les sous 
 Aller chercher les valeurs dans les fichiers d'environnement dans le repertoire docker du projet, situé sur les serveurs de l'abes. Pour un externe : demander les chaines de connexion à
 soa@abes.fr
 
-- Télécharger un Tomcat 9 sur https://tomcat.apache.org/download-90.cgi en zip, et dezipper
+- Télécharger un Tomcat 10 sur https://tomcat.apache.org/download-90.cgi en zip, et dezipper
 - L'installer et mettre la configuration d'execution suivante dans intellij.
 - A côté du run classique, faire edit configurations, créer avec + en haut a gauche une nouvelle configuration tomcat
 - Faire pointer dans l'espace Application -> vers le dossier tomcat préalablement dézippé 
 - Mettre en url : http://localhost:8080/web_war_exploded/
-- Mettre en JRE : coretto-11 (ou une autre jdk 11)
+- Mettre en JRE : temurin-21 (ou une autre jdk 21)
 - HTTP port : 8080
 - JMX port : 1099
 - Dans before launch, faire +, puis Build Artifacts, et selection web: war exploded

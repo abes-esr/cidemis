@@ -1,21 +1,23 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.exception.DaoException;
-import fr.abes.cidemis.model.cidemis.RegistryUser;
-import fr.abes.cidemis.web.MyDispatcher;
-import lombok.extern.slf4j.Slf4j;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import fr.abes.cidemis.exception.DaoException;
+import fr.abes.cidemis.model.cidemis.RegistryUser;
+import fr.abes.cidemis.web.MyDispatcher;
+import fr.abes.cidemis.web.ParamHelper;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.net.MalformedURLException;
-import java.net.URL;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @MultipartConfig
@@ -23,6 +25,11 @@ import java.net.URL;
 public class Login extends AbstractServlet {
     @Value("${wsAuthSudoc.url}")
     private String urlAuth;
+    private final ParamHelper param;
+
+    public Login(ParamHelper param) {
+        this.param = param;
+    }
 
     @Override
     protected boolean checkSession() {
@@ -48,7 +55,7 @@ public class Login extends AbstractServlet {
 
             if (forwardedUri != null && forwardedUri.contains("afficher-demande")) {
                 newSession.setAttribute("forwarded_uri", "afficher-demande");
-                newSession.setAttribute("id_demande", Integer.parseInt(request.getParameter("id")));
+                newSession.setAttribute("id_demande", Integer.valueOf(request.getParameter("id")));
             }
             if (newSession.getAttribute("connexion") == null) {
                 try {
@@ -57,7 +64,6 @@ public class Login extends AbstractServlet {
                         newSession.setAttribute("login", true);
                     }
                 } catch (DaoException e) {
-                    e.printStackTrace();
                     request.setAttribute("tier_exception", e.getTierOfException());
                     request.setAttribute("table_exception", e.getTableOfException());
                     request.setAttribute("message_exception", e.getMessage());
@@ -86,10 +92,5 @@ public class Login extends AbstractServlet {
         } else {
             return MyDispatcher.ERREUR_LOGINJSP;
         }
-    }
-
-    @Override
-    protected String getServletInfo() {
-        return "Controller login";
     }
 }

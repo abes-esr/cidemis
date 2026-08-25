@@ -1,8 +1,9 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.web.MyDispatcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import fr.abes.cidemis.web.MyDispatcher;
 
 @Controller
 public class ErrorLoginServlet {
@@ -16,9 +17,5 @@ public class ErrorLoginServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws ServletException, IOException {
         this.getServletContext().getRequestDispatcher( MyDispatcher.ERREUR_LOGINJSP ).forward( request, response );
     }
-
-    @Override
-    public String getServletInfo() {
-        return "erreur d'authentification";
-    }*/
+    */
 }

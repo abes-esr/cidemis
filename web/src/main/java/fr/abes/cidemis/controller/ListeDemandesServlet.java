@@ -1,27 +1,38 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.exception.DaoException;
-import fr.abes.cidemis.localisation.LocalProvider;
-import fr.abes.cidemis.model.cidemis.Connexion;
-import fr.abes.cidemis.model.cidemis.Options;
-import fr.abes.cidemis.web.MyDispatcher;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.exception.DaoException;
+import fr.abes.cidemis.localisation.LocalProvider;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.model.cidemis.Options;
+import fr.abes.cidemis.service.IOptionsService;
+import fr.abes.cidemis.web.MyDispatcher;
+import fr.abes.cidemis.web.ParamHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Controller
 public class ListeDemandesServlet extends AbstractServlet {
+    private final ParamHelper param;
+    private final IOptionsService options;
 
+    public ListeDemandesServlet(ParamHelper param, IOptionsService options) {
+        this.param = param;
+        this.options = options;
+    }
+
+    @Override
     protected boolean checkSession() {
         return true;
     }
@@ -29,7 +40,7 @@ public class ListeDemandesServlet extends AbstractServlet {
 	@RequestMapping(value = "/liste-demandes")
     public String listeDemandes(HttpServletRequest request, HttpServletResponse response, HttpSession session){
         String forward = this.catchProcessRequest(request, response);
-        if (forward != "") {
+        if (!"".equals(forward)) {
             return forward;
         }
 	    Connexion connexion = (Connexion)session.getAttribute("connexion");
@@ -43,7 +54,7 @@ public class ListeDemandesServlet extends AbstractServlet {
         List<Options> optionscolonnesListe = null;
         boolean error = false;
         try {
-            optionscolonnesListe = getService().getOptions().findOptionsColonnesByCbsUsers(connexion.getUser());
+            optionscolonnesListe = this.options.findOptionsColonnesByCbsUsers(connexion.getUser());
         } catch (DaoException e) {
             request.setAttribute("tier_exception", e.getTierOfException());
             request.setAttribute("table_exception", e.getTableOfException());
@@ -57,7 +68,7 @@ public class ListeDemandesServlet extends AbstractServlet {
         }
 
         // On écrira les colonnes de la table HTML dans l'ordre alphabétique et on ajoutera en attribut la position réelle qui sera envoyée à la DataTable
-        List<Options> optionscolonnesListeOrdered = new ArrayList();
+        List<Options> optionscolonnesListeOrdered = new ArrayList<>();
         LocalProvider lang = new LocalProvider(request.getLocale());
         for (Options o : optionscolonnesListe){
             o.setName(lang.getMsg(o.getLibOption()));
@@ -77,7 +88,7 @@ public class ListeDemandesServlet extends AbstractServlet {
         request.setAttribute("optionscolonnes_liste_ordered", optionscolonnesListeOrdered);
         request.setAttribute("positions", Arrays.toString(positions));
         
-        if (param.getParameter("profil") != "") {
+        if (!"".equals(param.getParameter("profil"))) {
             session.setAttribute("profil", param.getParameter("profil"));
         }
         String login = "login";
@@ -87,10 +98,5 @@ public class ListeDemandesServlet extends AbstractServlet {
         }
 
         return MyDispatcher.LISTE_DEMANDESJSP;
-    }
-
-    @Override
-    protected String getServletInfo() {
-        return "Affiche tableau de bord";
     }
 }

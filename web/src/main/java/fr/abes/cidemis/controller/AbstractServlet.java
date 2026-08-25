@@ -1,28 +1,19 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.service.CidemisManageService;
-import fr.abes.cidemis.web.MyDispatcher;
-import fr.abes.cidemis.web.ParamHelper;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Enumeration;
 
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.web.MyDispatcher;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.Enumeration;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 public abstract class AbstractServlet {
-    private static final long serialVersionUID = -7728100545184244608L;
-    @Autowired
-    protected ParamHelper param;
-    @Autowired
-    private CidemisManageService service;
-
     /**
      * Retourne si, pour la servlet, il faut redirriger vers la servlet de déconnexion
      *
@@ -95,5 +86,4 @@ public abstract class AbstractServlet {
         log.warn("METHOD CALLED OR ATTRIBUTE:" + nameOfMethod + "-> RESULT: " + object);
     }
 
-    protected abstract String getServletInfo();
 }

@@ -1,6 +1,23 @@
 package fr.abes.cidemis.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import fr.abes.cbs.exception.CBSException;
 import fr.abes.cbs.exception.ZoneException;
 import fr.abes.cbs.process.ProcessCBS;
@@ -10,24 +27,29 @@ import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.mail.CidemisMail;
 import fr.abes.cidemis.mail.CidemisTemplatesHtml;
-import fr.abes.cidemis.model.cidemis.*;
+import fr.abes.cidemis.model.cidemis.CbsUsers;
+import fr.abes.cidemis.model.cidemis.CidemisNotices;
+import fr.abes.cidemis.model.cidemis.Commentaires;
+import fr.abes.cidemis.model.cidemis.DefaultTaggues;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.model.cidemis.EtatsDemandes;
+import fr.abes.cidemis.model.cidemis.JournalDemandes;
+import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
+import fr.abes.cidemis.model.cidemis.RegistryUser;
+import fr.abes.cidemis.model.cidemis.Taggues;
+import fr.abes.cidemis.model.cidemis.TypesDemandes;
 import fr.abes.cidemis.model.dto.DemandeDto;
-import fr.abes.cidemis.service.CidemisManageService;
+import fr.abes.cidemis.service.IControleEnvoiMailService;
 import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.service.IReferenceService;
+import fr.abes.cidemis.service.ITagguesService;
+import fr.abes.cidemis.service.IToolsService;
+import fr.abes.cidemis.service.IUsersService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Service
 @Slf4j
 public class DemandesService implements IDemandesService {
-    private final CidemisManageService service;
     private final CidemisDaoProvider dao;
     private final CidemisMail mail;
 
@@ -42,10 +64,23 @@ public class DemandesService implements IDemandesService {
     private String cbsPassword;
     private String path;
 
-    public DemandesService(CidemisManageService service, CidemisDaoProvider dao, CidemisMail mail) {
-        this.service = service;
+    private final IToolsService tools;
+    private final IUsersService users;
+    private final ITagguesService taggues;
+    private final IReferenceService reference;
+    private final IControleEnvoiMailService controleEnvoiMail;
+
+    public DemandesService(
+        CidemisDaoProvider dao, CidemisMail mail, ITagguesService taggues, IReferenceService reference,
+        IToolsService tools, IControleEnvoiMailService controleEnvoiMail, IUsersService users
+    ) {
         this.dao = dao;
         this.mail = mail;
+        this.tools = tools;
+        this.users = users;
+        this.taggues = taggues;
+        this.reference = reference;
+        this.controleEnvoiMail = controleEnvoiMail;
     }
 
 
@@ -95,7 +130,7 @@ public class DemandesService implements IDemandesService {
             return null;
         }
         Demandes demande = demandes.get();
-        demande.setTaggues(service.getTaggues().findTagguesByDemandes(demande));
+        demande.setTaggues(this.taggues.findTagguesByDemandes(demande));
         if (demande.getNotice() != null && demande.getNotice().getStatutNotice().equals("d")) {
             demande.setNoticeSupprimeeSudoc();
         }
@@ -299,6 +334,7 @@ public class DemandesService implements IDemandesService {
      * @param demande : la demande à vérifier
      * @return true if user can delete it
      */
+    @Override
     public boolean canUserDeleteDemande(CbsUsers user, Demandes demande) {
         boolean canDelete = false;
 
@@ -326,9 +362,9 @@ public class DemandesService implements IDemandesService {
 
     @Override
     public void archiverDemande(Demandes demande, CbsUsers user) {
-        demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_ARCHIVEE));
+        demande.setEtatsDemandes(this.reference.findEtatsdemandes(Constant.ETAT_ARCHIVEE));
         saveJournal(demande, user);
-        service.getDemande().save(demande);
+        this.save(demande);
     }
 
     private void saveJournal(Demandes demande, CbsUsers user) {
@@ -501,7 +537,7 @@ public class DemandesService implements IDemandesService {
         // création de notice, le paramètre numPPN sera alors rempli avec le ppn
         // de la notice nouvellement créée
         if (this.demandeDto.getNumPpn() != null && this.demandeDto.getNumPpn().matches("(\\d{9})|((?i)\\d{8}X{1})")) {
-            notice = service.getTools().findCidemisNotice(this.demandeDto.getNumPpn());
+            notice = this.tools.findCidemisNotice(this.demandeDto.getNumPpn());
             if (!notice.getPpn().isEmpty()) {
                 this.demandeDto.setPpn(this.demandeDto.getNumPpn());
             }
@@ -555,10 +591,11 @@ public class DemandesService implements IDemandesService {
         demande.setNbCommentairesISSN(nbCommentIssn[0]);
 
         // Sauvegarde de la demande en BDD
-        return service.getDemande().save(demande);
+        return save(demande);
 
     }
 
+    @Override
     public void envoiMail(Demandes demande, CbsUsers user) throws RestClientException, JsonProcessingException {
         // Si la demande part au CIEPS on envoie un MAIL
         if (demande.sendMailToCieps(user)) {
@@ -581,9 +618,9 @@ public class DemandesService implements IDemandesService {
      * Créer la demande dans le cadre d'une nouvelle demande
      */
     private Demandes processNewDemande(Demandes demande, CbsUsers user) {
-        demande.setNotice(service.getTools().findCidemisNotice(this.demandeDto.getPpn()));
+        demande.setNotice(this.tools.findCidemisNotice(this.demandeDto.getPpn()));
 
-        demande.setTypesDemandes(service.getReference().findTypesdemandes(this.demandeDto.getTypesDemandes()));
+        demande.setTypesDemandes(this.reference.findTypesdemandes(this.demandeDto.getTypesDemandes()));
         demande.setIdProfil(Constant.PROFIL_PAS_PROFIL);
         demande.setDateDemande(new Date());
         demande.setRcrDemandeur(user.getLibrary());
@@ -592,7 +629,7 @@ public class DemandesService implements IDemandesService {
 
         if ("valider".equals(this.demandeDto.getAction())) {
             if (user.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR), demande);
             } else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                 demande.setIdProfil(demande.getNotice().getIdprofil());
                 demande = setEtatISSN(demande, false);
@@ -601,15 +638,15 @@ public class DemandesService implements IDemandesService {
         } else if ("creernotice".equals(this.demandeDto.getAction())) {
             if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                 demande.setIdProfil(demande.getNotice().getIdprofil());
-                demande.setTypesDemandes(service.getReference().findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
+                demande.setTypesDemandes(this.reference.findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
                 demande = setEtatISSN(demande, false);
                 setCentreISSN(demande, true);
             }
         } else {
             if (user.getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR), demande);
             } else if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR), demande);
             }
         }
         return demande;
@@ -620,9 +657,9 @@ public class DemandesService implements IDemandesService {
      * modification d'une demande déjà existante
      */
     private Demandes processUpdateDemande(CbsUsers user) throws RestClientException {
-        Demandes demande = service.getDemande().findDemande(this.demandeDto.getIdDemande());
-        demande.setNotice(service.getTools().findCidemisNotice(this.demandeDto.getPpn()));
-        if (demande != null && service.getDemande().canUserModifyDemande(user, demande)) {
+        Demandes demande = findDemande(this.demandeDto.getIdDemande());
+        demande.setNotice(this.tools.findCidemisNotice(this.demandeDto.getPpn()));
+        if (demande != null && canUserModifyDemande(user, demande)) {
             if ("valider".equals(this.demandeDto.getAction())) {
                 switch (demande.getEtatsDemandes().getIdEtatDemande()) {
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR:
@@ -636,13 +673,13 @@ public class DemandesService implements IDemandesService {
                     case Constant.ETAT_VALIDEE_PAR_CORCAT:
                     case Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL:
                     case Constant.ETAT_PRECISION_PAR_CORCAT:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
                         break;
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CATALOGUEUR), demande);
                         break;
                     case Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_PRECISION_PAR_CATALOGUEUR), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_PRECISION_PAR_CATALOGUEUR), demande);
                         break;
                     default:
                         break;
@@ -651,7 +688,7 @@ public class DemandesService implements IDemandesService {
                 switch (demande.getEtatsDemandes().getIdEtatDemande()) {
                     case Constant.ETAT_VALIDEE_PAR_CATALOGUEUR:
                     case Constant.ETAT_PRECISION_PAR_CATALOGUEUR:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR), demande);
                         break;
                     default:
                         break;
@@ -662,13 +699,13 @@ public class DemandesService implements IDemandesService {
                     case Constant.ETAT_VALIDEE_PAR_CATALOGUEUR:
                     case Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR:
                     case Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR), demande);
                         break;
                     case Constant.ETAT_PRECISION_PAR_CORCAT:
                     case Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL:
                     case Constant.ETAT_VERS_INTERNATIONAL:
                     case Constant.ETAT_VALIDEE_PAR_CORCAT:
-                        this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT), demande);
+                        this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT), demande);
                         break;
                     default:
                         break;
@@ -677,16 +714,16 @@ public class DemandesService implements IDemandesService {
                 if (user.getRoles().getIdRole().equals(Constant.ROLE_CORCAT)) {
                     demande.setIdProfil(demande.getNotice().getIdprofil());
                     demande.setTypesDemandes(
-                            service.getReference().findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
+                            this.reference.findTypesdemandes(Constant.TYPE_DEMANDE_NUMEROTATION));
                     demande = setEtatISSN(demande, false);
                     this.setCentreISSN(demande, true);
                 }
             } else if ("refuser".equals(this.demandeDto.getAction())) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE), demande);
             } else if ("accepter".equals(this.demandeDto.getAction())) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE), demande);
             } else if ("rejeter".equals(this.demandeDto.getAction())) {
-                this.changeEtat(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT), demande);
+                this.changeEtat(this.reference.findEtatsdemandes(Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT), demande);
             }
         } else {
             log.error(
@@ -701,8 +738,8 @@ public class DemandesService implements IDemandesService {
     }
 
     private void envoiMailChangementStatut(Demandes demande, CbsUsers user) throws RestClientException {
-        service.getControleEnvoiMail().whichRoleOfUserToSendEmail(user, demande).forEach(role -> {
-            service.getUsers().findCbsUsersToSendEmail(demande, role).forEach(cbsUsers -> {
+        this.controleEnvoiMail.whichRoleOfUserToSendEmail(user, demande).forEach(role -> {
+            this.users.findCbsUsersToSendEmail(demande, role).forEach(cbsUsers -> {
                 String subjectOfMail = "[AVIS CIDEMIS] : changement de statut de la demande n°"
                         + demande.getIdDemande() + " : " + demande.getEtatsDemandes().getLibelleEtatDemande();
                 String receiverOfMail = cbsUsers.getUserEmail();
@@ -826,7 +863,7 @@ public class DemandesService implements IDemandesService {
                         // Si l'utilisateur qui a uploadé le fichier est le même que
                         // celui voulant le supprimer alors c'est OK | Le CorCat a le
                         // droit de tout supprimer
-                        if (j.getIdPiece() == Integer.parseInt(filetodelete)
+                        if (j.getIdPiece() == Integer.valueOf(filetodelete)
                                 && (j.getCbsUsers().getUserNum().equals(user.getUserNum())
                                 || j.getCbsUsers().getRoles().getIdRole() == Constant.ROLE_CATALOGUEUR)) {
                             justificatifsToRemove.add(j);
@@ -1031,11 +1068,11 @@ public class DemandesService implements IDemandesService {
      */
     private Demandes setEtatISSN(Demandes demande, boolean fromIssn) {
         if (Constant.getCodePaysFr().contains(demande.getNotice().getPays()))
-            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT));
+            demande.setEtatsDemandes(this.reference.findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT));
         else if (fromIssn)
-            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VERS_INTERNATIONAL));
+            demande.setEtatsDemandes(this.reference.findEtatsdemandes(Constant.ETAT_VERS_INTERNATIONAL));
         else
-            demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL));
+            demande.setEtatsDemandes(this.reference.findEtatsdemandes(Constant.ETAT_VALIDEE_PAR_CORCAT_VERS_INTERNATIONAL));
         return demande;
     }
 
@@ -1120,6 +1157,7 @@ public class DemandesService implements IDemandesService {
     }
 
     // Utilisé pour optimiser le temps d'affichage du tableau de bord
+    @Override
     public Map<String, String> getDemandemap(Demandes demande) {
         Map<String, String> demandeMap = new HashMap<>();
 

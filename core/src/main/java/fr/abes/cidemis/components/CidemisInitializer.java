@@ -1,18 +1,25 @@
 package fr.abes.cidemis.components;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.dao.CodePaysDao;
-import fr.abes.cidemis.model.CodePays;
-import fr.abes.cidemis.model.cidemis.DefaultTaggues;
-import fr.abes.cidemis.model.cidemis.ZoneCorrection;
-import fr.abes.cidemis.service.CidemisManageService;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.dao.CodePaysDao;
+import fr.abes.cidemis.model.CodePays;
+import fr.abes.cidemis.model.cidemis.DefaultTaggues;
+import fr.abes.cidemis.model.cidemis.ZoneCorrection;
+import fr.abes.cidemis.service.IReferenceService;
+import fr.abes.cidemis.service.ITagguesService;
 
 @Component
 public class CidemisInitializer {
@@ -28,8 +35,14 @@ public class CidemisInitializer {
     private String pathMailMensuel;
     @Value("${mail.ws.skip}")
     private boolean skipMailFlag;
-    @Autowired
-    private CidemisManageService service;
+
+    private final IReferenceService reference;
+    private final ITagguesService taggues;
+
+    public CidemisInitializer(IReferenceService reference, ITagguesService taggues) {
+        this.reference = reference;
+        this.taggues = taggues;
+    }
 
     @EventListener
     public void afterPropertiesSet(ContextRefreshedEvent event)  {
@@ -118,7 +131,7 @@ public class CidemisInitializer {
         Map<String, List<String>> listeFiltre = new HashMap<>();
 
         listeFiltre.put(Constant.COL_DEMANDE_TYPE, new ArrayList(Arrays.asList("COR", "CRE", "NUM")));
-        listeFiltre.put(Constant.COL_ETAT, service.getReference().findAllEtatsdemandesLib());
+        listeFiltre.put(Constant.COL_ETAT, this.reference.findAllEtatsdemandesLib());
         listeFiltre.put(Constant.COL_PUBLICATION_TYPE, new ArrayList(Constant.LISTE_TYPE_PUBLICATION.values()));
         listeFiltre.put(Constant.COL_SUPPORT_TYPE, new ArrayList(Constant.LISTE_TYPE_DOCUMENT.values()));
         listeFiltre.put(Constant.COL_PUBLICATION_PAYS, new ArrayList(Constant.CODE_PAYS_SORTED.keySet()));
@@ -200,13 +213,13 @@ public class CidemisInitializer {
 
     private List<DefaultTaggues> getDefaultTaggues() {
         List<DefaultTaggues> listDefaultTag = new ArrayList<>();
-        listDefaultTag.addAll(service.getTaggues().findAllDefaultTaggues());
+        listDefaultTag.addAll(this.taggues.findAllDefaultTaggues());
         return listDefaultTag;
     }
 
     private List<ZoneCorrection> getZonesCorrection() {
         List<ZoneCorrection> listeZoneCorr = new ArrayList<>();
-        listeZoneCorr.addAll(service.getReference().findAllZonesCorrection());
+        listeZoneCorr.addAll(this.reference.findAllZonesCorrection());
         return listeZoneCorr;
     }
 }

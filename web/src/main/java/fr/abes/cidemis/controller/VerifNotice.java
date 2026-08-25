@@ -1,19 +1,21 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cbs.exception.CBSException;
-import fr.abes.cbs.process.ProcessCBS;
-import fr.abes.cidemis.components.NoticeHelper;
-import fr.abes.cidemis.model.cidemis.Connexion;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import fr.abes.cbs.exception.CBSException;
+import fr.abes.cbs.process.ProcessCBS;
+import fr.abes.cidemis.components.NoticeHelper;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.web.ParamHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.PrintWriter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -24,6 +26,12 @@ public class VerifNotice extends AbstractServlet {
     private String cbsPort;
     @Value("${cbs.password}")
     private String cbsPassword;
+
+    private final ParamHelper param;
+
+    public VerifNotice(ParamHelper param) {
+        this.param = param;
+    }
 
     @Override
     protected boolean checkSession() {
@@ -53,10 +61,5 @@ public class VerifNotice extends AbstractServlet {
             	out.print("NOK");
             }
         }
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Vérifie que l'utilisateur peut modifier une notice";
     }
 }

@@ -1,5 +1,11 @@
 package fr.abes.cidemis.service.impl;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.exception.DaoException;
 import fr.abes.cidemis.model.cidemis.CbsUsers;
@@ -8,18 +14,15 @@ import fr.abes.cidemis.model.cidemis.OptionsRoles;
 import fr.abes.cidemis.model.cidemis.Roles;
 import fr.abes.cidemis.service.IOptionsService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class OptionsService implements IOptionsService {
-    @Autowired
-    private CidemisDaoProvider dao;
+    private final CidemisDaoProvider dao;
+
+    public OptionsService(CidemisDaoProvider dao) {
+        this.dao = dao;
+    }
 
     @Override
     public Boolean save(Options options) {
