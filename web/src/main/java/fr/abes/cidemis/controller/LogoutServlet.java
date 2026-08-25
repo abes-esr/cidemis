@@ -1,17 +1,18 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.web.MyDispatcher;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import fr.abes.cidemis.web.MyDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -62,10 +63,4 @@ public class LogoutServlet extends AbstractServlet {
             }
         }
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Déconnecte l'utilisateur";
-    }
-
 }

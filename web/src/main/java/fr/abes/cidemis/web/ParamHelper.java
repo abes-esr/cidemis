@@ -1,13 +1,29 @@
 package fr.abes.cidemis.web;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.codec.Charsets;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.abes.cidemis.components.Fichier;
 import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.exception.DaoException;
 import fr.abes.cidemis.model.cidemis.Connexion;
 import fr.abes.cidemis.model.cidemis.RegistryUser;
-import fr.abes.cidemis.service.CidemisManageService;
+import fr.abes.cidemis.service.IUsersService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,36 +31,22 @@ import jakarta.servlet.http.Part;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.Charsets;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Slf4j
 @Getter
 @Setter
+@Service
 public class ParamHelper {
-    @Autowired
-    private CidemisManageService service;
-
     private HttpServletRequest request = null;
     private HashMap<String, List<String>> multipartParams = null;
     private HashMap<String, List<Fichier>> multipartFiles = null;
     private boolean isMultipart = false;
+    private final IUsersService users;
 
 
     // Récupère les paramètres dans le cas d'un formulaire MultiPart
-    public ParamHelper() {
-
-    }
-
-    public ParamHelper(HttpServletRequest request) {
-        setRequest(request);
+    public ParamHelper(IUsersService users) {
+        this.users = users;
     }
 
     public void setRequest(HttpServletRequest request) {
@@ -117,7 +119,7 @@ public class ParamHelper {
      * @throws IOException
      */
     public Boolean login(HttpSession session, RegistryUser user) throws DaoException {
-        Connexion connexion = service.getUsers().login(user);
+        Connexion connexion = this.users.login(user);
 
         if (connexion == null) {
             return false;

@@ -1,29 +1,37 @@
 package fr.abes.cidemis.service.impl;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
-import fr.abes.cidemis.dao.cidemis.IJdbcTemplateDao;
-import fr.abes.cidemis.exception.DaoException;
-import fr.abes.cidemis.model.cidemis.*;
-import fr.abes.cidemis.service.CidemisManageService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
+import fr.abes.cidemis.exception.DaoException;
+import fr.abes.cidemis.model.cidemis.CbsUsers;
+import fr.abes.cidemis.model.cidemis.Commentaires;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.model.cidemis.JournalDemandes;
+import fr.abes.cidemis.model.cidemis.Options;
+import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
+import fr.abes.cidemis.model.cidemis.RegistryUser;
+import fr.abes.cidemis.model.cidemis.Roles;
+import fr.abes.cidemis.model.cidemis.UsersRoles;
+import fr.abes.cidemis.service.IOptionsService;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Slf4j
 public class UsersService implements fr.abes.cidemis.service.IUsersService {
-    @Autowired
-    private CidemisDaoProvider dao;
-    @Autowired
-    private CidemisManageService service;
+    private final CidemisDaoProvider dao;
+    private final IOptionsService options;
 
-    @Autowired
-    private IJdbcTemplateDao jdbcTemplateDao;
+    public UsersService(CidemisDaoProvider dao, IOptionsService options) {
+        this.dao = dao;
+        this.options = options;
+    }
 
     @Override
     public boolean save(CbsUsers cbsUsers) {
@@ -259,7 +267,7 @@ public class UsersService implements fr.abes.cidemis.service.IUsersService {
 
         // On vérifie qu'il a une liste de colonnes définie dans ses options
         // Sinon on lui en créé une en fonction de son rôle
-        service.getOptions().verifOptionsColonnesByCbsUsers(user);
+        this.options.verifOptionsColonnesByCbsUsers(user);
         return new Connexion(user, registryUser);
     }
 

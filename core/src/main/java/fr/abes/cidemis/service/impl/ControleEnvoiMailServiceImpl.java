@@ -1,22 +1,25 @@
 package fr.abes.cidemis.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.model.cidemis.CbsUsers;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.Roles;
-import fr.abes.cidemis.service.CidemisManageService;
 import fr.abes.cidemis.service.IControleEnvoiMailService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import fr.abes.cidemis.service.IUsersService;
 
 @Service
 public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
-    @Autowired
-    CidemisManageService service;
+    private final IUsersService users;
 
+    public ControleEnvoiMailServiceImpl(IUsersService users) {
+        this.users = users;
+    }
+    
     @Override
     public List<Roles> whichRoleOfUserToSendEmail(CbsUsers user, Demandes demande) {
         List<Roles> roles = new ArrayList<>();
@@ -26,7 +29,7 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                     Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT,
                     Constant.ETAT_PRECISION_PAR_CATALOGUEUR
                     )) {
-                roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
+                roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
             }
             return roles;
 
@@ -36,7 +39,7 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                     Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT,
                     Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
             )){
-                roles.add(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR));
+                roles.add(this.users.findRoles(Constant.ROLE_CATALOGUEUR));
             }
             return roles;
 
@@ -45,14 +48,14 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                         Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE
                 )){
-                    roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
-                    roles.add(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR));
+                    roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
+                    roles.add(this.users.findRoles(Constant.ROLE_CATALOGUEUR));
 
                 }
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                         Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT
                 )){
-                    roles.add(service.getUsers().findRoles(Constant.ROLE_CORCAT));
+                    roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
                 }
             return roles;
             default: return roles;

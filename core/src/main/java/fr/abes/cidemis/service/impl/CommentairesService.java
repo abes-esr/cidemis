@@ -1,26 +1,26 @@
 package fr.abes.cidemis.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.model.cidemis.CbsUsers;
 import fr.abes.cidemis.model.cidemis.Commentaires;
 import fr.abes.cidemis.model.cidemis.Demandes;
-import fr.abes.cidemis.service.CidemisManageService;
 import fr.abes.cidemis.service.ICommentairesService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class CommentairesService implements ICommentairesService {
 
-    @Autowired
-    private CidemisDaoProvider dao;
-    @Autowired
-    private CidemisManageService service;
+    private final CidemisDaoProvider dao;
+
+    public CommentairesService(CidemisDaoProvider dao) {
+        this.dao = dao;
+    }
 
 
     /**

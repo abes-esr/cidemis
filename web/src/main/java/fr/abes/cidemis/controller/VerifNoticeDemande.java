@@ -1,7 +1,9 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.model.cidemis.Demandes;
-import fr.abes.cidemis.web.MyDispatcher;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -11,15 +13,23 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.web.MyDispatcher;
+import fr.abes.cidemis.web.ParamHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class VerifNoticeDemande extends AbstractServlet {
+    private final ParamHelper param;
+    private final IDemandesService demandes;
+
+    public VerifNoticeDemande(ParamHelper param, IDemandesService demandes) {
+        this.param = param;
+        this.demandes = demandes;
+    }
 
     @Value("${cidemis.url}")
     private String url;
@@ -31,7 +41,7 @@ public class VerifNoticeDemande extends AbstractServlet {
         String demandeNum = param.getParameter("demande_num");
         
         if (!"-1".equals(demandeNum)) {
-            Demandes demande = getService().getDemande().findDemande(Integer.parseInt(demandeNum));
+            Demandes demande = this.demandes.findDemande(Integer.valueOf(demandeNum));
             List<String> zonesManquantes = new ArrayList<>();
             List<String> zonesPresentes = new ArrayList<>();
             String errorCode;
@@ -68,10 +78,4 @@ public class VerifNoticeDemande extends AbstractServlet {
         //si la vérification est ok, on envoie directement au controller de création de la demande, pour ne pas avoir à repasser par le client.
         //return demandeController.creationDemande(request, response, session);
     }
-	
-    @Override
-    public String getServletInfo() {
-        return "Vérifie qu'une notice peut avoir une demande (tous les champs présents par exemple)";
-    }
-
 }

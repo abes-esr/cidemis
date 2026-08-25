@@ -5,22 +5,6 @@
 
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
-import fr.abes.cidemis.service.CidemisManageService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import javax.net.ssl.*;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,17 +14,42 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
+import fr.abes.cidemis.service.IPiecesJustificativesService;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Servlet de diffusion
  */
 @Slf4j
 @Controller
 public class Diffusion extends HttpServlet {
-	@Autowired
-	private CidemisManageService service;
-
 	@Value("${path.justificatifs}")
 	private String path;
+
+	private final IPiecesJustificativesService piecesJustificatives;
+
+	public Diffusion(IPiecesJustificativesService piecesJustificatives) {
+		this.piecesJustificatives = piecesJustificatives;
+	}
 
 	public void init(ServletConfig config) throws ServletException {
 		try {
@@ -81,7 +90,7 @@ public class Diffusion extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		if (request.getParameter("id") != null) {
 			Integer pjid = Integer.parseInt(request.getParameter("id"));
-			PiecesJustificatives pj = this.service.getPiecesJustificatives().findPiecesJustificatives(pjid);
+			PiecesJustificatives pj = this.piecesJustificatives.findPiecesJustificatives(pjid);
 			String fichier = pj.getPathFichier(path);
 
 			try {
@@ -169,14 +178,5 @@ public class Diffusion extends HttpServlet {
 			log.error( e.getMessage(), e);
 			return false;
 		}
-	}
-
-	/**
-	 * Returns a short description of the servlet.
-	 * 
-	 * @return a String containing servlet description
-	 */
-	public String getServletInfo() {
-		return "Servlet de diffusion des PJ";
 	}
 }
