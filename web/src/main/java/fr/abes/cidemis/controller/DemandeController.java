@@ -1,22 +1,10 @@
 package fr.abes.cidemis.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.cbs.exception.CBSException;
-import fr.abes.cbs.exception.ZoneException;
-import fr.abes.cbs.process.ProcessCBS;
-import fr.abes.cidemis.bean.DemandesListe;
-import fr.abes.cidemis.components.Fichier;
-import fr.abes.cidemis.components.NoticeHelper;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.model.cidemis.*;
-import fr.abes.cidemis.model.dto.DemandeDto;
-import fr.abes.cidemis.service.CidemisManageService;
-import fr.abes.cidemis.web.MyDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Controller;
@@ -25,17 +13,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestClientException;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import fr.abes.cbs.exception.CBSException;
+import fr.abes.cbs.exception.ZoneException;
+import fr.abes.cbs.process.ProcessCBS;
+import fr.abes.cidemis.bean.DemandesListe;
+import fr.abes.cidemis.components.Fichier;
+import fr.abes.cidemis.components.NoticeHelper;
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.model.cidemis.CbsUsers;
+import fr.abes.cidemis.model.cidemis.CidemisNotices;
+import fr.abes.cidemis.model.cidemis.Commentaires;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.model.dto.DemandeDto;
+import fr.abes.cidemis.service.ICommentairesService;
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.service.IPiecesJustificativesService;
+import fr.abes.cidemis.service.IReferenceService;
+import fr.abes.cidemis.service.IToolsService;
+import fr.abes.cidemis.web.MyDispatcher;
+import fr.abes.cidemis.web.ParamHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
 public class DemandeController extends AbstractServlet {
-    @Autowired
-    private CidemisManageService service;
-
     @Value("${cbs.url}")
     private String cbsUrl;
     @Value("${cbs.port}")
@@ -45,6 +52,27 @@ public class DemandeController extends AbstractServlet {
 
     @Value("${path.justificatifs}")
     private String path;
+
+    private final IDemandesService demandesService;
+    private final IPiecesJustificativesService piecesJustificatives;
+    private final ICommentairesService commentaires;
+    private final IReferenceService references;
+    private final IToolsService tools;
+
+    private final ParamHelper param;
+
+    public DemandeController(
+        IDemandesService demandes, IPiecesJustificativesService piecesJustificatives, ICommentairesService commentaires,
+        IReferenceService references, IToolsService tools, ParamHelper param
+    ) {
+        // super();
+        this.demandesService = demandes;
+        this.piecesJustificatives = piecesJustificatives;
+        this.commentaires = commentaires;
+        this.references = references;
+        this.tools = tools;
+        this.param = param;
+    }
 
     @Description("Afficher une demande")
     @GetMapping(value = "/afficher-demande")
@@ -56,27 +84,27 @@ public class DemandeController extends AbstractServlet {
         Connexion connexion = (Connexion) session.getAttribute("connexion");
         param.setRequest(request);
         Integer numdemande = Integer.parseInt(param.getParameter("id"));
-        Demandes demande = getService().getDemande().findDemande(numdemande);
+        Demandes demande = this.demandesService.findDemande(numdemande);
 
         // Si on a trouvé une demande, on la met à dispo de la jsp
         if (demande != null) {
-            demande.setPiecesJustificativeslist(service.getPiecesJustificatives().findPiecesJustificativesByDemandes(demande));
-            demande.setCommentairesList(service.getCommentaires().findCommentairesByDemandes(demande));
+            demande.setPiecesJustificativeslist(this.piecesJustificatives.findPiecesJustificativesByDemandes(demande));
+            demande.setCommentairesList(this.commentaires.findCommentairesByDemandes(demande));
 
             request.setAttribute("demande", demande);
 
             request.setAttribute("commentaires", demande.getCommentairesList());
             request.setAttribute("piecesJustificatives", demande.getPiecesJustificativeslist());
 
-            if (getService().getDemande().canUserModifyDemande(connexion.getUser(), demande)) {
+            if (this.demandesService.canUserModifyDemande(connexion.getUser(), demande)) {
                 // On récupère la liste des demandes portant sur le ppn
                 if (demande.getNotice() != null) {
-                    List<Demandes> demandes = getService().getDemande().findDemandesByPPN(demande.getNotice().getPpn());
+                    List<Demandes> demandes = this.demandesService.findDemandesByPPN(demande.getNotice().getPpn());
                     DemandesListe demandelisteWithSamePpn = new DemandesListe();
                     demandelisteWithSamePpn.setDemandeslist(demandes, demande);
                     request.setAttribute("demandes_with_same_ppn", demandelisteWithSamePpn);
                 }
-                Commentaires lastCommentaire = getService().getCommentaires().findLastCommentairesByDemande(demande);
+                Commentaires lastCommentaire = this.commentaires.findLastCommentairesByDemande(demande);
                 if (lastCommentaire != null && lastCommentaire.canUpdate(connexion.getUser())) {
                     request.setAttribute("lastCommentaire", lastCommentaire);
                 }
@@ -113,7 +141,7 @@ public class DemandeController extends AbstractServlet {
         String nextPage;
 
         // On récupère la liste des demandes portant sur le ppn
-        List<Demandes> demandes = getService().getDemande().findDemandesByPPN(ppn);
+        List<Demandes> demandes = this.demandesService.findDemandesByPPN(ppn);
         DemandesListe demandeliste = new DemandesListe();
         demandeliste.setDemandeslist(demandes, null);
         request.setAttribute("demandes_with_same_ppn", demandeliste);
@@ -148,30 +176,30 @@ public class DemandeController extends AbstractServlet {
                 demande.setJournalDemandesList(new ArrayList<>());
                 demande.setPiecesJustificativeslist(new ArrayList<>());
                 demande.setCbsUsers(connexion.getUser());
-                demande.setTypesDemandes(getService().getReference().findTypesdemandes(Constant.TYPE_DEMANDE_CREATION));
-                demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
+                demande.setTypesDemandes(this.references.findTypesdemandes(Constant.TYPE_DEMANDE_CREATION));
+                demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
                 demande.setIln(connexion.getUser().getIln());
                 request.setAttribute("demande", demande);
-                request.setAttribute("type_demande", getService().getReference().findTypesdemandes(typeDemande));
+                request.setAttribute("type_demande", this.references.findTypesdemandes(typeDemande));
 
                 if (ajax)
                     nextPage = MyDispatcher.RESEND_FORMJSP;
                 else
                     nextPage = MyDispatcher.CREATIONDEMANDEJSP;
             } else {
-                CidemisNotices notice = getService().getTools().findCidemisNotice(ppn);
+                CidemisNotices notice = this.tools.findCidemisNotice(ppn);
                 if (notice == null) {
                     nextPage = MyDispatcher.AUCUNENOTICEJSP;
                 } else {
                     Demandes demande = new Demandes();
                     if (connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR))
-                        demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
+                        demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_CATALOGUEUR));
                     else if (connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CORCAT))
-                        demande.setEtatsDemandes(getService().getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR));
+                        demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_VALIDATION_RESPONSABLE_CR));
 
                     demande.setDateDemande(new Date());
                     demande.setNotice(notice);
-                    demande.setTypesDemandes(getService().getReference().findTypesdemandes(typeDemande));
+                    demande.setTypesDemandes(this.references.findTypesdemandes(typeDemande));
                     demande.setCbsUsers(connexion.getUser());
                     demande.setRcrDemandeur(connexion.getUser().getLibrary());
                     demande.setPiecesJustificativeslist(new ArrayList<>());
@@ -188,7 +216,7 @@ public class DemandeController extends AbstractServlet {
             }
         }
         request.setAttribute("ppn", ppn);
-        request.setAttribute("type_demande", getService().getReference().findTypesdemandes(typeDemande));
+        request.setAttribute("type_demande", this.references.findTypesdemandes(typeDemande));
         return nextPage;
     }
 
@@ -205,8 +233,8 @@ public class DemandeController extends AbstractServlet {
         DemandeDto demandeDto = initDemande(connexion.getUser());
         Demandes demande;
         try {
-            demande = getService().getDemande().creerDemande(demandeDto, connexion.getUser(), connexion.getRegistryuser(), cbsUrl, cbsPort, cbsPassword, path);
-            getService().getDemande().envoiMail(demande, connexion.getUser());
+            demande = this.demandesService.creerDemande(demandeDto, connexion.getUser(), connexion.getRegistryuser(), cbsUrl, cbsPort, cbsPassword, path);
+            this.demandesService.envoiMail(demande, connexion.getUser());
         } catch (JsonProcessingException r) {
             request.setAttribute("error_code", "ERROR_WSMAIL");
             request.setAttribute("texte_erreur", r.getMessage());
@@ -277,21 +305,21 @@ public class DemandeController extends AbstractServlet {
 
         Integer demandenum = Integer.parseInt(param.getParameter("demandenum"));
         Connexion connexion = (Connexion) session.getAttribute("connexion");
-        Demandes demande = service.getDemande().findDemande(demandenum);
+        Demandes demande = this.demandesService.findDemande(demandenum);
 
         ProcessCBS cbs = new ProcessCBS();
         try {
             cbs.authenticate(cbsUrl, cbsPort, "M" + connexion.getRegistryuser().getLibrary(), cbsPassword);
             NoticeHelper noticehelper = new NoticeHelper(cbs);
 
-            if (service.getDemande().canUserDeleteDemande(connexion.getUser(), demande)) {
+            if (this.demandesService.canUserDeleteDemande(connexion.getUser(), demande)) {
                 if (demande.getTitre() != null && !demande.getTitre().equals("NOTICE SUPPRIMÉE DU SUDOC") && !connexion.getUser().getRoles().getIdRole().equals(Constant.ROLE_CATALOGUEUR)) {
                     if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION))
                         noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "301", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
                     else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION))
                         noticehelper.chercherEtSupprimerZoneNotice(demande.getNotice().getPpn(), "830", "$a", "(identifiant Cidemis : " + demande.getIdDemande() + ")");
                 }
-                service.getDemande().delete(demande);
+                this.demandesService.delete(demande);
 
             }
         } catch (CBSException | ZoneException ex) {
@@ -313,17 +341,12 @@ public class DemandeController extends AbstractServlet {
 
         String demandenum = param.getParameter("demandenum");
         Connexion connexion = (Connexion) session.getAttribute("connexion");
-        Demandes demande = service.getDemande().findDemande(Integer.parseInt(demandenum));
-        demande.setJournalDemandesList(service.getDemande().findJournalDemandesByDemandes(demande));
-        if (service.getDemande().canUserArchiveDemande(connexion.getUser(), demande)) {
-            service.getDemande().archiverDemande(demande, connexion.getUser());
+        Demandes demande = this.demandesService.findDemande(Integer.parseInt(demandenum));
+        demande.setJournalDemandesList(this.demandesService.findJournalDemandesByDemandes(demande));
+        if (this.demandesService.canUserArchiveDemande(connexion.getUser(), demande)) {
+            this.demandesService.archiverDemande(demande, connexion.getUser());
         }
         return MyDispatcher.LISTE_DEMANDES;
 
-    }
-
-    @Override
-    protected String getServletInfo() {
-        return "Controleur pour les operations portant sur les demandes";
     }
 }

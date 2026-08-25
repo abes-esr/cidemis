@@ -1,20 +1,34 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.model.cidemis.CidemisNotices;
-import fr.abes.cidemis.model.cidemis.Demandes;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.model.cidemis.CidemisNotices;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.service.IToolsService;
+import fr.abes.cidemis.web.ParamHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @Controller
 public class VerifPPN extends AbstractServlet {
+    private final ParamHelper param;
+    private final IDemandesService demandesService;
+    private final IToolsService tools;
+
+    public VerifPPN(ParamHelper param, IToolsService tools, IDemandesService demandes) {
+        this.param = param;
+        this.demandesService = demandes;
+        this.tools = tools;
+    }
+
     @Override
     protected boolean checkSession() { return true; }
 
@@ -24,7 +38,7 @@ public class VerifPPN extends AbstractServlet {
         param.setRequest(request);
         PrintWriter out = response.getWriter();
         String ppn = param.getParameter("ppn");
-        CidemisNotices notice = getService().getTools().findCidemisNotice(ppn);
+        CidemisNotices notice = this.tools.findCidemisNotice(ppn);
 
         if (notice != null && !notice.getPpn().isEmpty()){
             this.checkPPN(out, notice);
@@ -43,7 +57,7 @@ public class VerifPPN extends AbstractServlet {
         }
         else {
             // On doit maintenant vérifier qu'il n'y a pas de demande déjà en cours sur ce PPN
-            List<Demandes> demandes = getService().getDemande().findDemandesByPPN(notice.getPpn());
+            List<Demandes> demandes = this.demandesService.findDemandesByPPN(notice.getPpn());
             boolean find = false;
             
             for (Demandes d:demandes){
@@ -57,9 +71,4 @@ public class VerifPPN extends AbstractServlet {
             out.print(find ? "DEMANDE_EXISTANTE" : "OK");
         }
 	}
-
-    @Override
-    public String getServletInfo() {
-        return "Vérifie que le PPN saisi est ok et que je peux faire une demande dessus";
-    }
 }

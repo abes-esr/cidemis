@@ -1,5 +1,22 @@
 package fr.abes.cidemis.ajoutRefus;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.logging.log4j.Level;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
+
 import fr.abes.cbs.exception.CBSException;
 import fr.abes.cbs.exception.ZoneException;
 import fr.abes.cbs.notices.Biblio;
@@ -13,23 +30,6 @@ import fr.abes.cidemis.model.cidemis.Commentaires;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.Level;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 public class MajSudocTasklet implements Tasklet, StepExecutionListener {
@@ -41,12 +41,15 @@ public class MajSudocTasklet implements Tasklet, StepExecutionListener {
     private String login;
     @Value("${cbs.password}")
     private String pass;
-    @Autowired
-    private CidemisDaoProvider dao;
+    private final CidemisDaoProvider dao;
     private ProcessCBS processCBS;
     private List<Demandes> demandes;
     private String dateNowFormat = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     private String pattern = "(identifiant Cidemis : ";
+
+    public MajSudocTasklet(CidemisDaoProvider dao) {
+        this.dao = dao;
+    }
 
     @Override
     public void beforeStep(StepExecution stepExecution) {

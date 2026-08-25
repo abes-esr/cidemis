@@ -1,25 +1,23 @@
 package fr.abes.cidemis.mail;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.model.cidemis.Demandes;
-import fr.abes.cidemis.service.CidemisManageService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class CidemisMail {
     private final String SUBJECT_TEST = " - Environnement de Test";
-    @Autowired
-    CidemisManageService service;
     //l'url du ws d'envoi des mails
     @Value("${mail.ws.url}")
     protected String url;

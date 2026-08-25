@@ -1,34 +1,34 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.model.cidemis.DefaultTaggues;
-import fr.abes.cidemis.service.CidemisManageService;
+import java.io.IOException;
+
 import org.json.JSONArray;
 
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.model.cidemis.DefaultTaggues;
+import fr.abes.cidemis.service.ITagguesService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
 
 @WebServlet("/liste-taggues-ajax")
 public class ListeDefaultTagguesAjax extends AbstractServlet{
-	private static final long serialVersionUID = -2917772721708462881L;
+	private final ITagguesService taggues;
+
+	public ListeDefaultTagguesAjax(ITagguesService taggues) {
+		this.taggues = taggues;
+	}
+
 
 	public void processRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session)
 			throws IOException {
 		response.setContentType("application/javascript;charset=" + Constant.ENCODE);
-		CidemisManageService service = new CidemisManageService();
 		
-		DefaultTaggues defaultTaggues = service.getTaggues().findDefaultTagguesByLibelle(request.getParameter("term"));
+		DefaultTaggues defaultTaggues = this.taggues.findDefaultTagguesByLibelle(request.getParameter("term"));
 		JSONArray tagguesDataJson = new JSONArray();
 		tagguesDataJson.put(defaultTaggues.getLibelleTaggue());
 
 		tagguesDataJson.write(response.getWriter());
-	}
-	
-	@Override
-	public String getServletInfo() {
-		return "Retourne les taggues par défaut";
 	}
 }

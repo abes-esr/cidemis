@@ -1,13 +1,15 @@
 package fr.abes.cidemis.webstats.correspondence.typepublication;
 
-import com.opencsv.CSVWriter;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.webstats.Export;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.opencsv.CSVWriter;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.webstats.Export;
 
 public class DemandeTypePublication extends Export<DemandeTypePublicationDto> {
     public DemandeTypePublication(JdbcTemplate jdbcTemplate) {
@@ -26,6 +28,6 @@ public class DemandeTypePublication extends Export<DemandeTypePublicationDto> {
 
     @Override
     protected List getQuery() {
-        return new ArrayList();
+        return new ArrayList<>();
     }
 }

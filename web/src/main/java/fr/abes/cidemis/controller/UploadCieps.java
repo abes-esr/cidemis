@@ -1,21 +1,24 @@
 package fr.abes.cidemis.controller;
 
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.process.UploadCiepsProcess;
-import fr.abes.cidemis.web.MyDispatcher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.process.UploadCiepsProcess;
+import fr.abes.cidemis.web.MyDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class UploadCieps extends AbstractServlet {
-    @Autowired
-    private UploadCiepsProcess uploadCiepsProcess;
+    private final UploadCiepsProcess uploadCiepsProcess;
+
+    public UploadCieps(UploadCiepsProcess uploadCiepsProcess) {
+        this.uploadCiepsProcess = uploadCiepsProcess;
+    }
+    
     @Override
     protected boolean checkSession() {
         return true;
@@ -33,10 +36,4 @@ public class UploadCieps extends AbstractServlet {
         uploadCiepsProcess.processRequest(session, request);
         return MyDispatcher.UPLOADCIEPS;
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Permet au CIEP d'envoyer les fichiers remplits de demande (cette servlet traite le fichier reçu)";
-    }
-
 }

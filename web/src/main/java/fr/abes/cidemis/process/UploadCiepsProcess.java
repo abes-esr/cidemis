@@ -1,30 +1,5 @@
 package fr.abes.cidemis.process;
 
-import fr.abes.cbs.exception.CBSException;
-import fr.abes.cbs.exception.ZoneException;
-import fr.abes.cbs.process.ProcessCBS;
-import fr.abes.cidemis.components.Fichier;
-import fr.abes.cidemis.components.NoticeHelper;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
-import fr.abes.cidemis.model.cidemis.*;
-import fr.abes.cidemis.service.CidemisManageService;
-import fr.abes.cidemis.utils.ISSN;
-import fr.abes.cidemis.web.ParamHelper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -34,6 +9,38 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import fr.abes.cbs.exception.CBSException;
+import fr.abes.cbs.exception.ZoneException;
+import fr.abes.cbs.process.ProcessCBS;
+import fr.abes.cidemis.components.Fichier;
+import fr.abes.cidemis.components.NoticeHelper;
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
+import fr.abes.cidemis.model.cidemis.CidemisNotices;
+import fr.abes.cidemis.model.cidemis.Commentaires;
+import fr.abes.cidemis.model.cidemis.Connexion;
+import fr.abes.cidemis.model.cidemis.Demandes;
+import fr.abes.cidemis.model.cidemis.JournalDemandes;
+import fr.abes.cidemis.service.ICommentairesService;
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.service.IReferenceService;
+import fr.abes.cidemis.service.IToolsService;
+import fr.abes.cidemis.utils.ISSN;
+import fr.abes.cidemis.web.ParamHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -45,13 +52,10 @@ public class UploadCiepsProcess {
 
     private static final String LINE_NUMBER = "Line n°";
 
-    @Autowired
-    private CidemisManageService service;
-    @Autowired
-    private CidemisDaoProvider dao;
+    private final CidemisDaoProvider dao;
     private NoticeHelper noticehelper = null;
     private Connexion connexion = null;
-    private List<String> results = new ArrayList();
+    private List<String> results = new ArrayList<>();
 
     @Value("${cbs.url}")
     private String cbsUrl;
@@ -64,6 +68,24 @@ public class UploadCiepsProcess {
     private int linesValid = 0;
     private int nbLine = 0;
 
+    private final ParamHelper param;
+    private final IToolsService tools;
+    private final IDemandesService demandes;
+    private final IReferenceService references;
+    private final ICommentairesService commentaires;
+
+    public UploadCiepsProcess(
+        CidemisDaoProvider dao, IDemandesService demandes, ICommentairesService commentaires,
+        IReferenceService references, IToolsService tools, ParamHelper param
+    ) {
+        this.dao = dao;
+        this.demandes = demandes;
+        this.commentaires = commentaires;
+        this.references = references;
+        this.tools = tools;
+        this.param = param;
+    }
+
     /**
      * Récupère la requête et la traite avec la lecture du fichier
      * @param session
@@ -71,7 +93,7 @@ public class UploadCiepsProcess {
      */
     public void processRequest(HttpSession session, HttpServletRequest request) {
         this.connexion = (Connexion) session.getAttribute("connexion");
-        ParamHelper param = new ParamHelper(request);
+        this.param.setRequest(request);
         List<Fichier> fichierList = param.getFile("fichier_cieps");
         Fichier fichier = fichierList.get(0);
 
@@ -85,7 +107,7 @@ public class UploadCiepsProcess {
             log.error("Erreur de communication avec le CBS");
         }
         this.noticehelper = new NoticeHelper(cbs);
-        this.results = new ArrayList();
+        this.results = new ArrayList<>();
 
         this.linesEmpty = 0;
         this.linesValid = 0;
@@ -146,9 +168,9 @@ public class UploadCiepsProcess {
             }
             // Si c'est effectivement une ligne a traiter
             else if (demandeNum.matches("^[0-9]+$")) {
-                demande = service.getDemande().findDemande(Integer.parseInt(demandeNum));
-                demande.setCommentairesList(service.getCommentaires().findCommentairesByDemandes(demande));
-                demande.setJournalDemandesList(service.getDemande().findJournalDemandesByDemandes(demande));
+                demande = this.demandes.findDemande(Integer.parseInt(demandeNum));
+                demande.setCommentairesList(this.commentaires.findCommentairesByDemandes(demande));
+                demande.setJournalDemandesList(this.demandes.findJournalDemandesByDemandes(demande));
                 try {
                     this.processDemande(demande, ppn, status, commentairetxt);
                 } catch (CBSException | ZoneException | IOException e) {
@@ -172,7 +194,7 @@ public class UploadCiepsProcess {
      * @param commentairetxt
      */
     protected void processDemande(Demandes demande, String ppn, String status, String commentairetxt) throws ZoneException, CBSException, IOException {
-        if (service.getDemande().canUserModifyDemande(this.connexion.getUser(), demande)) {
+        if (this.demandes.canUserModifyDemande(this.connexion.getUser(), demande)) {
             if (demande.getNotice().getPpn().equals(ppn)) {
                 if ((!status.isEmpty() || demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION)) && this.checkDemande(demande, status, commentairetxt)) {
                     this.saveDemande(demande, ppn, status, commentairetxt);
@@ -206,7 +228,7 @@ public class UploadCiepsProcess {
 
         if (UploadCiepsProcess.REJECTED.equals(status)) {
             if (!commentairetxt.isEmpty()) {
-                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE));
+                demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE));
             }
             else {
                 this.addMessage(demande, "Missing comment.");
@@ -215,7 +237,7 @@ public class UploadCiepsProcess {
         }
         else if (UploadCiepsProcess.INFORMATION_NEEDED.equals(status)) {
             if (!commentairetxt.isEmpty()){
-                demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT));
+                demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT));
             }
             else {
                 this.addMessage(demande, "Missing comment.");
@@ -230,7 +252,7 @@ public class UploadCiepsProcess {
                     success = false;
                 }
                 else if (commentairetxt.equals(UploadCiepsProcess.COMPLETED)) {
-                    demande.setEtatsDemandes(service.getReference().findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE));
+                    demande.setEtatsDemandes(this.references.findEtatsdemandes(Constant.ETAT_TRAITEMENT_TERMINE_ACCEPTEE));
                 }
                 else if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_CORRECTION)) {
                     this.addMessage(demande, "No action has been taken with this request as there is no keyword in neither of the ISSN nor the COMMENT columns.");
@@ -270,7 +292,7 @@ public class UploadCiepsProcess {
         else if (UploadCiepsProcess.ACCEPTED.equals(commentairetxt) || UploadCiepsProcess.COMPLETED.equals(commentairetxt)){
             if (demande.getTypesDemandes().getIdTypeDemande().equals(Constant.TYPE_DEMANDE_NUMEROTATION)){
                 // Si il n'y a pas de n°ISSN dans la notice, on l'ajoute
-                CidemisNotices notice = service.getTools().findCidemisNotice(ppn);
+                CidemisNotices notice = this.tools.findCidemisNotice(ppn);
                 if (notice.getIssn() != null && notice.getIssn().contains(issn))
                     erreursNoticeZone.add("ISSN " + issn + " existe déjà pour la demande " + demande.getIdDemande());
                 else {
@@ -325,7 +347,7 @@ public class UploadCiepsProcess {
 
         // //////////////////////////////////////////////////////////////////////////////////////////////
         // FIN //////////////////////////////////////////////////////////////////////////////////////////
-        service.getDemande().save(demande);
+        this.demandes.save(demande);
         this.addMessage(demande, "OK.");
     }
 

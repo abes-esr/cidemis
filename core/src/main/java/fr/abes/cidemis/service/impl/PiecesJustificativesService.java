@@ -1,22 +1,25 @@
 package fr.abes.cidemis.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.model.cidemis.CbsUsers;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
 import fr.abes.cidemis.service.IPiecesJustificativesService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class PiecesJustificativesService implements IPiecesJustificativesService {
-    @Autowired
-    private CidemisDaoProvider dao;
+    private final CidemisDaoProvider dao;
+
+    public PiecesJustificativesService(CidemisDaoProvider dao) {
+        this.dao = dao;
+    }
 
     /**
      *

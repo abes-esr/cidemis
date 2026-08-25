@@ -1,25 +1,24 @@
 package fr.abes.cidemis.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+
 import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.model.cidemis.CbsUsers;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.EtatsDemandes;
 import fr.abes.cidemis.model.cidemis.Roles;
-import fr.abes.cidemis.service.CidemisManageService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import fr.abes.cidemis.service.IUsersService;
 
 
 class ControleEnvoiMailServiceImplTest {
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    CidemisManageService service;
+    @Mock
+    IUsersService users;
     @InjectMocks
     ControleEnvoiMailServiceImpl controleEnvoiMailService;
 
@@ -33,19 +32,19 @@ class ControleEnvoiMailServiceImplTest {
         MockitoAnnotations.openMocks(this);
         Roles roleCatalogueur = new Roles();
         roleCatalogueur.setIdRole(Constant.ROLE_CATALOGUEUR);
-        when(service.getUsers().findRoles(Constant.ROLE_CATALOGUEUR)).thenReturn(roleCatalogueur);
+        when(this.users.findRoles(Constant.ROLE_CATALOGUEUR)).thenReturn(roleCatalogueur);
 
         Roles roleRespCr = new Roles();
         roleRespCr.setIdRole(Constant.ROLE_CORCAT);
-        when(service.getUsers().findRoles(Constant.ROLE_CORCAT)).thenReturn(roleRespCr);
+        when(this.users.findRoles(Constant.ROLE_CORCAT)).thenReturn(roleRespCr);
 
         Roles roleIssn = new Roles();
         roleIssn.setIdRole(Constant.ROLE_ISSN);
-        when(service.getUsers().findRoles(Constant.ROLE_ISSN)).thenReturn(roleIssn);
+        when(this.users.findRoles(Constant.ROLE_ISSN)).thenReturn(roleIssn);
 
         Roles roleCieps = new Roles();
         roleIssn.setIdRole(Constant.ROLE_CIEPS);
-        when(service.getUsers().findRoles(Constant.ROLE_CIEPS)).thenReturn(roleCieps);
+        when(this.users.findRoles(Constant.ROLE_CIEPS)).thenReturn(roleCieps);
 
         this.roles = new Roles();
         this.cbsUsers = new CbsUsers(1);
