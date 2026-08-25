@@ -5,9 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.abes.cidemis.ajoutRefus.MajSudocTasklet;
 import fr.abes.cidemis.ajoutRefus.SelectDemandesRefusTasklet;
 import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.mailing.DemandeMapper;
 import fr.abes.cidemis.mailing.DemandesDto;
 import fr.abes.cidemis.mailing.EnvoiMailTasklet;
 import fr.abes.cidemis.mailing.SelectDemandesTasklet;
+import fr.abes.cidemis.service.IDemandesService;
 import fr.abes.cidemis.webstats.ExportStatistiquesTasklet;
 import fr.abes.cidemis.webstats.VerifierParamsTasklet;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +82,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Job jobRefus(JobRepository jobRepository, @Qualifier("stepSelectDemandes") Step stepSelectDemandesRefus, @Qualifier("stepMajSudoc") Step stepMajSudoc) {
+    public Job jobRefus(JobRepository jobRepository, @Qualifier("stepSelectDemandesRefus") Step stepSelectDemandesRefus, @Qualifier("stepMajSudoc") Step stepMajSudoc) {
         return new JobBuilder(Constant.SPRING_BATCH_JOB_REFUS, jobRepository)
                 .incrementer(incrementer())
                 .start(stepSelectDemandesRefus).on(Constant.NODEMANDE).end()
@@ -109,10 +111,10 @@ public class BatchConfiguration {
     //Steps pour mailing CIEPS
     @Bean
     @JobScope
-    public Step stepSelectDemandes(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step stepSelectDemandes(JobRepository jobRepository, PlatformTransactionManager transactionManager, SelectDemandesTasklet selectDemandesTasklet) {
         return new StepBuilder("stepSelectDemande", jobRepository)
                 .allowStartIfComplete(true)
-                .tasklet(selectDemandesTasklet(), transactionManager)
+                .tasklet(selectDemandesTasklet, transactionManager)
                 .build();
     }
 
@@ -127,10 +129,10 @@ public class BatchConfiguration {
 
     //Steps pour job Ajout des commentaires de refus
     @Bean
-    public Step stepSelectDemandesRefus(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step stepSelectDemandesRefus(JobRepository jobRepository, PlatformTransactionManager transactionManager, SelectDemandesRefusTasklet selectDemandesRefusTasklet) {
         return new StepBuilder("stepSelectDemandeRefus", jobRepository)
                 .allowStartIfComplete(true)
-                .tasklet(selectDemandesRefusTasklet(), transactionManager)
+                .tasklet(selectDemandesRefusTasklet, transactionManager)
                 .build();
     }
 
@@ -151,14 +153,18 @@ public class BatchConfiguration {
 
     //tasklets envoi Mail CIEPS
     @Bean
-    public SelectDemandesTasklet selectDemandesTasklet() { return new SelectDemandesTasklet(); }
+    public SelectDemandesTasklet selectDemandesTasklet(DemandeMapper mapper, IDemandesService demandesService) {
+        return new SelectDemandesTasklet(mapper, demandesService);
+    }
 
     @Bean
     public EnvoiMailTasklet envoiMailTasklet() { return new EnvoiMailTasklet(); }
 
     //tasklets ajout commentaires refus
     @Bean
-    public Tasklet selectDemandesRefusTasklet() { return new SelectDemandesRefusTasklet(); }
+    public SelectDemandesRefusTasklet selectDemandesRefusTasklet(IDemandesService demandesService) {
+        return new SelectDemandesRefusTasklet(demandesService);
+    }
 
     @Bean
     public Tasklet majSudocTasklet() { return new MajSudocTasklet(); }
