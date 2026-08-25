@@ -1,11 +1,22 @@
 package fr.abes.cidemis.mailing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.mail.CidemisMail;
-import fr.abes.cidemis.mail.CidemisTemplatesHtml;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -15,24 +26,23 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.mail.CidemisMail;
+import fr.abes.cidemis.mail.CidemisTemplatesHtml;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @JobScope
 public class EnvoiMailTasklet implements Tasklet, StepExecutionListener {
-    @Autowired
-    private CidemisMail mail;
+    private final CidemisMail mail;
     private Map<String, List<DemandesDto>> demandes;
 
-    public EnvoiMailTasklet() {
+    public EnvoiMailTasklet(CidemisMail mail) {
         this.demandes = new HashMap<>();
+        this.mail = mail;
     }
 
     @Override

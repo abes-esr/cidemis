@@ -1,22 +1,25 @@
 package fr.abes.cidemis.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.model.cidemis.DefaultTaggues;
 import fr.abes.cidemis.model.cidemis.Demandes;
 import fr.abes.cidemis.model.cidemis.Taggues;
 import fr.abes.cidemis.service.ITagguesService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 public class TagguesService implements ITagguesService {
-    @Autowired
-    private CidemisDaoProvider dao;
+    private final CidemisDaoProvider dao;
+
+    public TagguesService(CidemisDaoProvider dao) {
+        this.dao = dao;
+    }
 
     /**
      *

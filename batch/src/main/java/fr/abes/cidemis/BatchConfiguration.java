@@ -1,18 +1,5 @@
 package fr.abes.cidemis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import fr.abes.cidemis.ajoutRefus.MajSudocTasklet;
-import fr.abes.cidemis.ajoutRefus.SelectDemandesRefusTasklet;
-import fr.abes.cidemis.constant.Constant;
-import fr.abes.cidemis.mailing.DemandeMapper;
-import fr.abes.cidemis.mailing.DemandesDto;
-import fr.abes.cidemis.mailing.EnvoiMailTasklet;
-import fr.abes.cidemis.mailing.SelectDemandesTasklet;
-import fr.abes.cidemis.service.IDemandesService;
-import fr.abes.cidemis.webstats.ExportStatistiquesTasklet;
-import fr.abes.cidemis.webstats.VerifierParamsTasklet;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
@@ -25,10 +12,29 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScans;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import fr.abes.cidemis.ajoutRefus.MajSudocTasklet;
+import fr.abes.cidemis.ajoutRefus.SelectDemandesRefusTasklet;
+import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.mailing.DemandeMapper;
+import fr.abes.cidemis.mailing.DemandesDto;
+import fr.abes.cidemis.mailing.EnvoiMailTasklet;
+import fr.abes.cidemis.mailing.SelectDemandesTasklet;
+import fr.abes.cidemis.service.IDemandesService;
+import fr.abes.cidemis.webstats.ExportStatistiquesTasklet;
+import fr.abes.cidemis.webstats.VerifierParamsTasklet;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
@@ -166,8 +172,7 @@ public class BatchConfiguration {
         return new SelectDemandesRefusTasklet(demandesService);
     }
 
-    @Bean
-    public Tasklet majSudocTasklet() { return new MajSudocTasklet(); }
+    @Bean Tasklet majSudocTasklet() { return new MajSudocTasklet(null); }
 
     // ------------------ INCREMENTER ------------------
     protected JobParametersIncrementer incrementer() {

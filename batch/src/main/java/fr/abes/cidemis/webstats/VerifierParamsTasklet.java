@@ -1,8 +1,9 @@
 package fr.abes.cidemis.webstats;
 
-import fr.abes.cidemis.LogTime;
-import fr.abes.cidemis.constant.Constant;
-import lombok.extern.slf4j.Slf4j;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -11,10 +12,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import fr.abes.cidemis.LogTime;
+import fr.abes.cidemis.constant.Constant;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class VerifierParamsTasklet implements Tasklet, StepExecutionListener {
@@ -25,8 +25,8 @@ public class VerifierParamsTasklet implements Tasklet, StepExecutionListener {
     public void beforeStep(StepExecution stepExecution) {
         LogTime.logDebutTraitement(stepExecution);
         if (System.getProperty(Constant.ANNEE) != null && System.getProperty("mois") != null) {
-            this.annee = Integer.parseInt(System.getProperty(Constant.ANNEE));
-            this.mois = Integer.parseInt(System.getProperty("mois"));
+            this.annee = Integer.valueOf(System.getProperty(Constant.ANNEE));
+            this.mois = Integer.valueOf(System.getProperty("mois"));
         }
         else {
             //cas où le batch est appelé sans paramètre
@@ -60,7 +60,7 @@ public class VerifierParamsTasklet implements Tasklet, StepExecutionListener {
         }
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy");
-        Integer anneeInDateJour = Integer.parseInt(format.format(Calendar.getInstance().getTime()));
+        Integer anneeInDateJour = Integer.valueOf(format.format(Calendar.getInstance().getTime()));
 
         if (this.annee > anneeInDateJour) {
             log.error("L'année ne peut pas être supérieure à l'année en court");

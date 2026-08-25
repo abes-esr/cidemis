@@ -24,27 +24,28 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
     public List<Roles> whichRoleOfUserToSendEmail(CbsUsers user, Demandes demande) {
         List<Roles> roles = new ArrayList<>();
         switch (user.getRoles().getIdRole()){
-            case Constant.ROLE_CATALOGUEUR:
-            if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
-                    Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT,
-                    Constant.ETAT_PRECISION_PAR_CATALOGUEUR
-                    )) {
-                roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
+            case Constant.ROLE_CATALOGUEUR -> {
+                if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
+                        Constant.ETAT_EN_ATTENTE_PRECISION_CORCAT,
+                        Constant.ETAT_PRECISION_PAR_CATALOGUEUR
+                )) {
+                    roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
+                }
+                return roles;
             }
-            return roles;
 
-            case Constant.ROLE_CORCAT:
-            if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
-                    Constant.ETAT_PRECISION_PAR_CORCAT,
-                    Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT,
-                    Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
-            )){
-                roles.add(this.users.findRoles(Constant.ROLE_CATALOGUEUR));
+            case Constant.ROLE_CORCAT -> {
+                if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
+                        Constant.ETAT_PRECISION_PAR_CORCAT,
+                        Constant.ETAT_TRAITEMENT_REJETEE_PAR_CORCAT,
+                        Constant.ETAT_EN_ATTENTE_PRECISION_CATALOGUEUR
+                )){
+                    roles.add(this.users.findRoles(Constant.ROLE_CATALOGUEUR));
+                }
+                return roles;
             }
-            return roles;
 
-            case Constant.ROLE_ISSN:
-            case Constant.ROLE_CIEPS:
+            case Constant.ROLE_ISSN, Constant.ROLE_CIEPS -> {
                 if(this.demandeIsItOneOfTheFollowingStatus(demande.getEtatsDemandes().getIdEtatDemande(),
                         Constant.ETAT_TRAITEMENT_TERMINE_REFUSEE
                 )){
@@ -57,8 +58,11 @@ public class ControleEnvoiMailServiceImpl implements IControleEnvoiMailService {
                 )){
                     roles.add(this.users.findRoles(Constant.ROLE_CORCAT));
                 }
-            return roles;
-            default: return roles;
+                return roles;
+            }
+            default -> {
+                return roles;
+            }
         }
     }
 

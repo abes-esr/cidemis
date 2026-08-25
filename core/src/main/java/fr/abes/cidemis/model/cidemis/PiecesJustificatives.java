@@ -1,12 +1,17 @@
 package fr.abes.cidemis.model.cidemis;
 
+import java.io.Serializable;
+
 import fr.abes.cidemis.constant.Constant;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "PIECES_JUSTIFICATIVES")
@@ -42,17 +47,11 @@ public class PiecesJustificatives implements Serializable {
     public String getPublicname(){
         String prefix = "";
         switch(getDemande().getTypesDemandes().getIdTypeDemande()){
-            case Constant.TYPE_DEMANDE_NUMEROTATION:
-                prefix = "NUM";
-                break;
-            case Constant.TYPE_DEMANDE_CORRECTION:
-                prefix = "COR";
-                break;
-            case Constant.TYPE_DEMANDE_CREATION:
-                prefix = "CRE";
-                break;
-            default:
-                break;
+            case Constant.TYPE_DEMANDE_NUMEROTATION -> prefix = "NUM";
+            case Constant.TYPE_DEMANDE_CORRECTION -> prefix = "COR";
+            case Constant.TYPE_DEMANDE_CREATION -> prefix = "CRE";
+            default -> {
+                }
         }
         return getDemande().getIdDemande() + "_" + prefix + "_" + getLienPiece();
     }

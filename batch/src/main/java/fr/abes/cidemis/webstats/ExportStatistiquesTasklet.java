@@ -1,5 +1,20 @@
 package fr.abes.cidemis.webstats;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import fr.abes.cidemis.webstats.correspondence.etat.DemandeEtat;
 import fr.abes.cidemis.webstats.correspondence.type.DemandeType;
 import fr.abes.cidemis.webstats.correspondence.typepublication.DemandeTypePublication;
@@ -15,21 +30,6 @@ import fr.abes.cidemis.webstats.statsgeneral.demandesdonedelay.DemandesDoneDelay
 import fr.abes.cidemis.webstats.statsgeneral.demandesdonewithcriteria.DemandesDoneWithCriteria;
 import fr.abes.cidemis.webstats.statsgeneral.demandesissn.DemandesISSN;
 import fr.abes.cidemis.webstats.statsgeneral.demandesissnwithcriteria.DemandesISSNWithCriteria;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.scope.context.ChunkContext;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class ExportStatistiquesTasklet implements Tasklet, StepExecutionListener {
 

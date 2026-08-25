@@ -334,6 +334,7 @@ public class DemandesService implements IDemandesService {
      * @param demande : la demande à vérifier
      * @return true if user can delete it
      */
+    @Override
     public boolean canUserDeleteDemande(CbsUsers user, Demandes demande) {
         boolean canDelete = false;
 
@@ -594,6 +595,7 @@ public class DemandesService implements IDemandesService {
 
     }
 
+    @Override
     public void envoiMail(Demandes demande, CbsUsers user) throws RestClientException, JsonProcessingException {
         // Si la demande part au CIEPS on envoie un MAIL
         if (demande.sendMailToCieps(user)) {
@@ -1155,6 +1157,7 @@ public class DemandesService implements IDemandesService {
     }
 
     // Utilisé pour optimiser le temps d'affichage du tableau de bord
+    @Override
     public Map<String, String> getDemandemap(Demandes demande) {
         Map<String, String> demandeMap = new HashMap<>();
 

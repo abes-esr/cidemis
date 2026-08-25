@@ -51,6 +51,7 @@ public class Diffusion extends HttpServlet {
 		this.piecesJustificatives = piecesJustificatives;
 	}
 
+	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
 			// Permet d'accepter les certificats SSL des urls https à tester
