@@ -9,7 +9,6 @@ import org.springframework.batch.core.repository.ExecutionContextSerializer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +26,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.abes.cidemis.ajoutRefus.MajSudocTasklet;
 import fr.abes.cidemis.ajoutRefus.SelectDemandesRefusTasklet;
 import fr.abes.cidemis.constant.Constant;
+import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
+import fr.abes.cidemis.mail.CidemisMail;
 import fr.abes.cidemis.mailing.DemandeMapper;
 import fr.abes.cidemis.mailing.DemandesDto;
 import fr.abes.cidemis.mailing.EnvoiMailTasklet;
@@ -126,10 +127,10 @@ public class BatchConfiguration {
 
     @Bean
     @JobScope
-    public Step stepEnvoiMail(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step stepEnvoiMail(JobRepository jobRepository, PlatformTransactionManager transactionManager, EnvoiMailTasklet envoiMailTasklet) {
         return new StepBuilder("stepEnvoiMail", jobRepository)
                 .allowStartIfComplete(true)
-                .tasklet(envoiMailTasklet(), transactionManager)
+                .tasklet(envoiMailTasklet, transactionManager)
                 .build();
     }
 
@@ -143,10 +144,10 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Step stepMajSudoc(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step stepMajSudoc(JobRepository jobRepository, PlatformTransactionManager transactionManager, MajSudocTasklet majSudocTasklet) {
         return new StepBuilder("stepMajSudoc", jobRepository)
                 .allowStartIfComplete(true)
-                .tasklet(majSudocTasklet(), transactionManager)
+                .tasklet(majSudocTasklet, transactionManager)
                 .build();
     }
 
@@ -164,7 +165,9 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public EnvoiMailTasklet envoiMailTasklet() { return new EnvoiMailTasklet(); }
+    public EnvoiMailTasklet envoiMailTasklet(CidemisMail mail) {
+        return new EnvoiMailTasklet(mail);
+    }
 
     //tasklets ajout commentaires refus
     @Bean
@@ -172,7 +175,10 @@ public class BatchConfiguration {
         return new SelectDemandesRefusTasklet(demandesService);
     }
 
-    @Bean Tasklet majSudocTasklet() { return new MajSudocTasklet(null); }
+    @Bean
+    public MajSudocTasklet majSudocTasklet(CidemisDaoProvider dao) {
+        return new MajSudocTasklet(dao);
+    }
 
     // ------------------ INCREMENTER ------------------
     protected JobParametersIncrementer incrementer() {
