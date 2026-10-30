@@ -1,23 +1,6 @@
 package fr.abes.cidemis.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import fr.abes.cbs.exception.CBSException;
 import fr.abes.cbs.exception.ZoneException;
 import fr.abes.cbs.process.ProcessCBS;
@@ -27,25 +10,18 @@ import fr.abes.cidemis.constant.Constant;
 import fr.abes.cidemis.dao.cidemis.CidemisDaoProvider;
 import fr.abes.cidemis.mail.CidemisMail;
 import fr.abes.cidemis.mail.CidemisTemplatesHtml;
-import fr.abes.cidemis.model.cidemis.CbsUsers;
-import fr.abes.cidemis.model.cidemis.CidemisNotices;
-import fr.abes.cidemis.model.cidemis.Commentaires;
-import fr.abes.cidemis.model.cidemis.DefaultTaggues;
-import fr.abes.cidemis.model.cidemis.Demandes;
-import fr.abes.cidemis.model.cidemis.EtatsDemandes;
-import fr.abes.cidemis.model.cidemis.JournalDemandes;
-import fr.abes.cidemis.model.cidemis.PiecesJustificatives;
-import fr.abes.cidemis.model.cidemis.RegistryUser;
-import fr.abes.cidemis.model.cidemis.Taggues;
-import fr.abes.cidemis.model.cidemis.TypesDemandes;
+import fr.abes.cidemis.model.cidemis.*;
 import fr.abes.cidemis.model.dto.DemandeDto;
-import fr.abes.cidemis.service.IControleEnvoiMailService;
-import fr.abes.cidemis.service.IDemandesService;
-import fr.abes.cidemis.service.IReferenceService;
-import fr.abes.cidemis.service.ITagguesService;
-import fr.abes.cidemis.service.IToolsService;
-import fr.abes.cidemis.service.IUsersService;
+import fr.abes.cidemis.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -863,13 +839,12 @@ public class DemandesService implements IDemandesService {
                         // Si l'utilisateur qui a uploadé le fichier est le même que
                         // celui voulant le supprimer alors c'est OK | Le CorCat a le
                         // droit de tout supprimer
-                        if (j.getIdPiece() == Integer.valueOf(filetodelete)
+                        if (j.getIdPiece() == Integer.parseInt(filetodelete)
                                 && (j.getCbsUsers().getUserNum().equals(user.getUserNum())
                                 || j.getCbsUsers().getRoles().getIdRole() == Constant.ROLE_CATALOGUEUR)) {
                             justificatifsToRemove.add(j);
                             delete = new File(j.getPathFichier(path));
                             this.supprimerFichier(delete);
-
                         }
                     }
                 }
